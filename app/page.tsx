@@ -263,7 +263,7 @@ function SolutionSection() {
 
               <div className="flex items-center gap-3 font-bold text-black/50 text-sm uppercase">
                 <span className="h-px flex-1 bg-black/20" />
-                120 000+ комбинаций
+                1M+ комбинаций
                 <span className="h-px flex-1 bg-black/20" />
               </div>
 
