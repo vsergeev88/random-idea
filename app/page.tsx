@@ -1,5 +1,3 @@
-import Link from "next/link"
-import type { Metadata } from "next"
 import {
   ArrowRight,
   Check,
@@ -11,16 +9,17 @@ import {
   Shuffle,
   Sparkles,
   Star,
-  BarChart3,
-} from "lucide-react"
-import { FadeIn } from "./_landing/FadeIn"
-import { FAQAccordion } from "./_landing/FAQAccordion"
+} from "lucide-react";
+import type { Metadata } from "next";
+import Link from "next/link";
+import { FAQAccordion } from "./_landing/FAQAccordion";
+import { FadeIn } from "./_landing/FadeIn";
 
 export const metadata: Metadata = {
   title: "random-idea — генератор идей для стартапа",
   description:
     "Придумай идею стартапа за 5 минут из продуманных смысловых блоков. Бесплатно, без регистрации.",
-}
+};
 
 export default function LandingPage() {
   return (
@@ -36,23 +35,23 @@ export default function LandingPage() {
       <FinalCTASection />
       <SiteFooter />
     </>
-  )
+  );
 }
 
 function HeroSection() {
   return (
-    <section className="relative overflow-hidden border-b-4 border-black bg-[#ff5c8a] py-20 sm:py-28">
+    <section className="relative overflow-hidden border-black border-b-4 bg-[#ff5c8a] py-20 sm:py-28">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,transparent_45%,rgba(0,0,0,0.07)_45%,rgba(0,0,0,0.07)_55%,transparent_55%,transparent_100%)]" />
-      <div className="pointer-events-none absolute right-8 top-12 hidden size-20 border-4 border-black bg-[#ffe600] sm:block" />
+      <div className="pointer-events-none absolute top-12 right-8 hidden size-20 border-4 border-black bg-[#ffe600] sm:block" />
       <div className="pointer-events-none absolute bottom-10 left-8 hidden size-14 border-4 border-black bg-[#00f0ff] sm:block" />
 
       <nav className="relative mx-auto mb-12 flex max-w-5xl items-center justify-between px-6">
-        <span className="font-mono text-sm font-black uppercase tracking-tight text-black">
+        <span className="font-black font-mono text-black text-sm uppercase tracking-tight">
           random-idea
         </span>
         <Link
+          className="inline-flex items-center gap-1 border-2 border-black bg-white px-3 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
           href="/generator"
-          className="inline-flex items-center gap-1 border-2 border-black bg-white px-3 py-1.5 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
         >
           Открыть генератор
           <ArrowRight className="size-3.5" />
@@ -67,7 +66,7 @@ function HeroSection() {
               Генератор идей для стартапа
             </div>
 
-            <h1 className="max-w-4xl font-black uppercase tracking-tight text-4xl leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl">
+            <h1 className="max-w-4xl font-black text-4xl uppercase leading-[1.05] tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
               Придумай идею за 5 минут,{" "}
               <span className="bg-[#00f0ff] px-2 text-black">
                 даже если кажется,
@@ -82,15 +81,15 @@ function HeroSection() {
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <Link
-                href="/generator"
                 className="inline-flex h-12 items-center justify-center gap-2 border-2 border-black bg-[#ffe600] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                href="/generator"
               >
                 <Shuffle className="size-4" />
                 Сгенерировать первую идею
               </Link>
               <a
-                href="#how-it-works"
                 className="inline-flex h-12 items-center justify-center gap-2 border-2 border-black bg-[#00f0ff] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                href="#how-it-works"
               >
                 Посмотреть, как работает
               </a>
@@ -98,13 +97,19 @@ function HeroSection() {
 
             <div className="flex flex-wrap justify-center gap-3">
               {[
-                { icon: <Clock className="size-4" />, text: "5 минут до первой идеи" },
-                { icon: <Layers className="size-4" />, text: "120 000+ комбинаций" },
+                {
+                  icon: <Clock className="size-4" />,
+                  text: "5 минут до первой идеи",
+                },
+                {
+                  icon: <Layers className="size-4" />,
+                  text: "1M+ комбинаций",
+                },
                 { icon: <Star className="size-4" />, text: "Бесплатно" },
               ].map((tag) => (
                 <span
+                  className="flex items-center gap-2 border-2 border-black bg-white px-3 py-2 font-bold text-sm uppercase shadow-[3px_3px_0_0_#000]"
                   key={tag.text}
-                  className="flex items-center gap-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold uppercase shadow-[3px_3px_0_0_#000]"
                 >
                   {tag.icon}
                   {tag.text}
@@ -113,10 +118,10 @@ function HeroSection() {
             </div>
 
             <div className="w-full max-w-xl border-2 border-black bg-white p-5 text-left shadow-[4px_4px_0_0_#000]">
-              <p className="mb-3 font-mono text-xs font-black uppercase text-black/40">
+              <p className="mb-3 font-black font-mono text-black/40 text-xs uppercase">
                 Пример сгенерированной идеи
               </p>
-              <p className="text-base font-medium leading-relaxed">
+              <p className="font-medium text-base leading-relaxed">
                 <span className="bg-[#ff5c8a] px-1 font-black text-black">
                   Telegram-бот
                 </span>{" "}
@@ -135,8 +140,8 @@ function HeroSection() {
               <div className="mt-3 flex flex-wrap gap-1.5">
                 {["продукт", "аудитория", "действие", "задача"].map((b) => (
                   <span
+                    className="border border-black/20 px-2 py-0.5 font-medium text-black/50 text-xs"
                     key={b}
-                    className="border border-black/20 px-2 py-0.5 text-xs font-medium text-black/50"
                   >
                     {b}
                   </span>
@@ -147,7 +152,7 @@ function HeroSection() {
         </FadeIn>
       </div>
     </section>
-  )
+  );
 }
 
 function ProblemSection() {
@@ -155,17 +160,17 @@ function ProblemSection() {
     "Идеи крутятся вокруг одних и тех же шаблонов.",
     "На брейншторм уходит время, а ясности всё равно мало.",
     "Трудно быстро собрать пул вариантов для выбора.",
-  ]
+  ];
 
   return (
-    <section className="border-b-4 border-black bg-[#ffe600] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#ffe600] py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Проблема
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Пустой лист убивает скорость запуска
             </h2>
           </div>
@@ -173,9 +178,9 @@ function ProblemSection() {
 
         <div className="space-y-4">
           {items.map((text, i) => (
-            <FadeIn key={text} delay={i * 0.1}>
+            <FadeIn delay={i * 0.1} key={text}>
               <div className="flex items-start gap-4 border-2 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
-                <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border-2 border-black bg-[#ff5c8a] text-xs font-black text-black">
+                <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border-2 border-black bg-[#ff5c8a] font-black text-black text-xs">
                   ✕
                 </div>
                 <p className="font-medium text-black">{text}</p>
@@ -193,19 +198,19 @@ function ProblemSection() {
         </FadeIn>
       </div>
     </section>
-  )
+  );
 }
 
 function SolutionSection() {
   return (
-    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#fff8d6] py-20 sm:py-28">
       <div className="mx-auto max-w-5xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-[#ffe600] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Решение
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Генератор, который расширяет рамки мышления
             </h2>
             <p className="mx-auto mt-4 max-w-2xl font-medium text-black/80">
@@ -224,8 +229,8 @@ function SolutionSection() {
                 оценки.
               </p>
               <Link
-                href="/generator"
                 className="inline-flex h-12 items-center gap-2 border-2 border-black bg-[#ffe600] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                href="/generator"
               >
                 <Shuffle className="size-4" />
                 Попробовать генерацию
@@ -236,7 +241,7 @@ function SolutionSection() {
           <FadeIn delay={0.2}>
             <div className="space-y-3">
               <div className="border-2 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
-                <p className="mb-3 font-mono text-xs font-black uppercase text-black/40">
+                <p className="mb-3 font-black font-mono text-black/40 text-xs uppercase">
                   4 смысловых блока
                 </p>
                 <div className="flex flex-wrap gap-2">
@@ -247,8 +252,8 @@ function SolutionSection() {
                     { label: "задача", bg: "bg-white border border-black" },
                   ].map((b) => (
                     <span
+                      className={`${b.bg} border-2 border-black px-3 py-1.5 font-black text-sm uppercase shadow-[2px_2px_0_0_#000]`}
                       key={b.label}
-                      className={`${b.bg} border-2 border-black px-3 py-1.5 text-sm font-black uppercase shadow-[2px_2px_0_0_#000]`}
                     >
                       {b.label}
                     </span>
@@ -256,14 +261,14 @@ function SolutionSection() {
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 text-sm font-bold uppercase text-black/50">
+              <div className="flex items-center gap-3 font-bold text-black/50 text-sm uppercase">
                 <span className="h-px flex-1 bg-black/20" />
                 120 000+ комбинаций
                 <span className="h-px flex-1 bg-black/20" />
               </div>
 
               <div className="border-2 border-black bg-[#111111] p-5 shadow-[4px_4px_0_0_#000]">
-                <p className="text-sm font-medium leading-relaxed">
+                <p className="font-medium text-sm leading-relaxed">
                   <span className="bg-[#ff5c8a] px-1 font-black text-black">
                     Figma-плагин
                   </span>{" "}
@@ -285,7 +290,7 @@ function SolutionSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function HowItWorksSection() {
@@ -302,12 +307,12 @@ function HowItWorksSection() {
       num: "03",
       text: "Сохрани лучшие, выбери 1–3 и переходи к проверке через интервью.",
     },
-  ]
+  ];
 
   return (
     <section
+      className="border-black border-b-4 bg-[#00f0ff] py-20 sm:py-28"
       id="how-it-works"
-      className="border-b-4 border-black bg-[#00f0ff] py-20 sm:py-28"
     >
       <div className="mx-auto max-w-3xl px-6">
         <FadeIn>
@@ -315,7 +320,7 @@ function HowItWorksSection() {
             <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Как это работает
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Три шага до рабочей заготовки идеи
             </h2>
           </div>
@@ -323,10 +328,10 @@ function HowItWorksSection() {
 
         <div className="space-y-8">
           {steps.map((step, i) => (
-            <FadeIn key={step.num} delay={i * 0.12}>
+            <FadeIn delay={i * 0.12} key={step.num}>
               <div className="flex items-start gap-5">
                 <div className="relative flex w-14 shrink-0 justify-center">
-                  <div className="flex size-14 items-center justify-center border-2 border-black bg-[#ff5c8a] font-mono font-black text-black text-lg">
+                  <div className="flex size-14 items-center justify-center border-2 border-black bg-[#ff5c8a] font-black font-mono text-black text-lg">
                     {step.num}
                   </div>
                   {i < steps.length - 1 && (
@@ -355,7 +360,7 @@ function HowItWorksSection() {
         </FadeIn>
       </div>
     </section>
-  )
+  );
 }
 
 function ValueSection() {
@@ -376,17 +381,17 @@ function ValueSection() {
       title: "Заморозка блоков",
       desc: "Понравилась аудитория или механика — зафиксируй блок и перебирай остальные.",
     },
-  ]
+  ];
 
   return (
-    <section className="border-b-4 border-black bg-[#ffe600] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#ffe600] py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Ценность
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Почему это полезно
             </h2>
           </div>
@@ -394,14 +399,16 @@ function ValueSection() {
 
         <div className="grid gap-5 sm:grid-cols-2">
           {items.map((item, i) => (
-            <FadeIn key={item.title} delay={i * 0.08}>
+            <FadeIn delay={i * 0.08} key={item.title}>
               <div className="flex items-start gap-4 border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000]">
                 <div className="mt-1 flex size-8 shrink-0 items-center justify-center border-2 border-black bg-[#00f0ff]">
                   <Check className="size-4 text-black" />
                 </div>
                 <div>
                   <h3 className="mb-1 font-black uppercase">{item.title}</h3>
-                  <p className="text-sm font-medium text-black/80">{item.desc}</p>
+                  <p className="font-medium text-black/80 text-sm">
+                    {item.desc}
+                  </p>
                 </div>
               </div>
             </FadeIn>
@@ -409,7 +416,7 @@ function ValueSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function ForWhomSection() {
@@ -432,17 +439,17 @@ function ForWhomSection() {
       desc: "Нужна заготовка концепта для тестирования — получай идеи без долгого брейншторма.",
       gradient: "from-indigo-500 to-blue-500",
     },
-  ]
+  ];
 
   return (
-    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#fff8d6] py-20 sm:py-28">
       <div className="mx-auto max-w-5xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-[#ffe600] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Для кого
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Сделано для тех, кто запускает новое
             </h2>
           </div>
@@ -450,22 +457,22 @@ function ForWhomSection() {
 
         <div className="grid gap-6 sm:grid-cols-3">
           {segments.map((s, i) => (
-            <FadeIn key={s.title} delay={i * 0.1}>
+            <FadeIn delay={i * 0.1} key={s.title}>
               <div className="group border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000] transition-all hover:-translate-y-1">
                 <div
                   className={`mb-4 inline-flex size-12 items-center justify-center border-2 border-black bg-gradient-to-br ${s.gradient} text-white`}
                 >
                   {s.icon}
                 </div>
-                <h3 className="mb-2 font-black uppercase text-xl">{s.title}</h3>
-                <p className="text-sm font-medium text-black/80">{s.desc}</p>
+                <h3 className="mb-2 font-black text-xl uppercase">{s.title}</h3>
+                <p className="font-medium text-black/80 text-sm">{s.desc}</p>
               </div>
             </FadeIn>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function SocialProofSection() {
@@ -480,17 +487,17 @@ function SocialProofSection() {
       author: "Катя В.",
       role: "Продуктовый дизайнер",
     },
-  ]
+  ];
 
   return (
-    <section className="border-b-4 border-black bg-[#00f0ff] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#00f0ff] py-20 sm:py-28">
       <div className="mx-auto max-w-4xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Первые пользователи
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Уже собирают свои списки идей
             </h2>
           </div>
@@ -498,13 +505,17 @@ function SocialProofSection() {
 
         <div className="grid gap-6 md:grid-cols-2">
           {testimonials.map((t, i) => (
-            <FadeIn key={t.author} delay={i * 0.1}>
+            <FadeIn delay={i * 0.1} key={t.author}>
               <div className="border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000]">
-                <div className="mb-4 font-black text-4xl leading-none text-black/20">"</div>
-                <p className="font-medium text-black leading-relaxed">{t.text}</p>
-                <div className="mt-5 border-t-2 border-black/10 pt-4">
-                  <p className="font-black uppercase text-sm">{t.author}</p>
-                  <p className="text-sm font-medium text-black/60">{t.role}</p>
+                <div className="mb-4 font-black text-4xl text-black/20 leading-none">
+                  "
+                </div>
+                <p className="font-medium text-black leading-relaxed">
+                  {t.text}
+                </p>
+                <div className="mt-5 border-black/10 border-t-2 pt-4">
+                  <p className="font-black text-sm uppercase">{t.author}</p>
+                  <p className="font-medium text-black/60 text-sm">{t.role}</p>
                 </div>
               </div>
             </FadeIn>
@@ -512,19 +523,19 @@ function SocialProofSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }
 
 function FAQSection() {
   return (
-    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+    <section className="border-black border-b-4 bg-[#fff8d6] py-20 sm:py-28">
       <div className="mx-auto max-w-2xl px-6">
         <FadeIn>
           <div className="mb-12 text-center">
             <div className="mb-4 inline-block border-2 border-black bg-[#ff5c8a] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               FAQ
             </div>
-            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+            <h2 className="font-black text-3xl uppercase tracking-tight sm:text-4xl">
               Частые вопросы
             </h2>
           </div>
@@ -532,19 +543,19 @@ function FAQSection() {
         <FAQAccordion />
       </div>
     </section>
-  )
+  );
 }
 
 function FinalCTASection() {
   return (
-    <section className="relative overflow-hidden border-b-4 border-black bg-[#111111] py-24">
+    <section className="relative overflow-hidden border-black border-b-4 bg-[#111111] py-24">
       <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(45deg,transparent_0%,transparent_40%,rgba(255,255,255,0.04)_40%,rgba(255,255,255,0.04)_50%,transparent_50%,transparent_100%)]" />
       <div className="relative mx-auto max-w-3xl px-6 text-center">
         <FadeIn>
           <div className="mb-6 flex justify-center">
             <Rocket className="size-10 text-[#ffe600]" />
           </div>
-          <h2 className="mb-6 font-black uppercase tracking-tight text-3xl text-white sm:text-4xl lg:text-5xl leading-tight">
+          <h2 className="mb-6 font-black text-3xl text-white uppercase leading-tight tracking-tight sm:text-4xl lg:text-5xl">
             Хватит ждать «идеальный инсайт» —{" "}
             <span className="bg-[#ffe600] px-2 text-black">
               собери рабочую идею
@@ -557,39 +568,39 @@ function FinalCTASection() {
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/generator"
               className="inline-flex h-12 items-center gap-2 border-2 border-white bg-[#ffe600] px-8 font-black text-base text-black uppercase shadow-[4px_4px_0_0_#ffe600] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              href="/generator"
             >
               <Shuffle className="size-4" />
               Запустить генератор идей
             </Link>
             <a
-              href="#how-it-works"
               className="inline-flex h-12 items-center gap-2 border-2 border-white bg-transparent px-8 font-black text-base text-white uppercase shadow-[4px_4px_0_0_#00f0ff] transition hover:bg-white hover:text-black hover:shadow-none"
+              href="#how-it-works"
             >
               Как это работает
             </a>
           </div>
-          <p className="mt-8 text-sm font-medium text-white/40 uppercase tracking-wide">
+          <p className="mt-8 font-medium text-sm text-white/40 uppercase tracking-wide">
             Бесплатно · Без регистрации · 120 000+ комбинаций
           </p>
         </FadeIn>
       </div>
     </section>
-  )
+  );
 }
 
 function SiteFooter() {
   return (
-    <footer className="border-t-4 border-black bg-white py-6 px-6">
-      <div className="mx-auto max-w-5xl flex items-center justify-between">
-        <span className="font-mono text-sm font-black uppercase text-black/50">
+    <footer className="border-black border-t-4 bg-white px-6 py-6">
+      <div className="mx-auto flex max-w-5xl items-center justify-between">
+        <span className="font-black font-mono text-black/50 text-sm uppercase">
           random-idea
         </span>
-        <span className="text-sm font-medium text-black/40 uppercase">
+        <span className="font-medium text-black/40 text-sm uppercase">
           MVP · 2025
         </span>
       </div>
     </footer>
-  )
+  );
 }
