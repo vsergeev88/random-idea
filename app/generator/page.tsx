@@ -16,7 +16,6 @@ import { generateIdea, type GeneratedIdea, type PinnedBlocks } from "@/lib/idea-
 import { cn } from "@/lib/utils"
 
 type SavedIdea = GeneratedIdea & { favorite: boolean }
-
 type FrozenKey = "productType" | "audience" | "action" | "problem"
 type FrozenState = Record<FrozenKey, boolean>
 
@@ -26,37 +25,51 @@ const RECENT_WINDOW = 5
 const BLOCKS: {
   key: FrozenKey
   label: string
-  colorClass: string
-  frozenClass: string
-  textClass: string
+  textBg: string
+  frozenTextBg: string
+  badgeNormal: string
+  badgeFrozen: string
+  lockColor: string
 }[] = [
   {
     key: "productType",
-    label: "продукт",
-    colorClass: "bg-violet-50 text-violet-700 hover:bg-violet-100",
-    frozenClass: "bg-violet-100 text-violet-800 ring-1 ring-violet-400",
-    textClass: "text-violet-600",
+    label: "ПРОДУКТ",
+    textBg: "bg-[#ff5c8a]",
+    frozenTextBg: "bg-[#ff5c8a] border-2 border-black",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#ff5c8a]/20 transition",
+    badgeFrozen: "border-2 border-black bg-[#ff5c8a]",
+    lockColor: "text-black",
   },
   {
     key: "audience",
-    label: "аудитория",
-    colorClass: "bg-blue-50 text-blue-700 hover:bg-blue-100",
-    frozenClass: "bg-blue-100 text-blue-800 ring-1 ring-blue-400",
-    textClass: "text-blue-600",
+    label: "АУДИТОРИЯ",
+    textBg: "bg-[#00f0ff]",
+    frozenTextBg: "bg-[#00f0ff] border-2 border-black",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#00f0ff]/20 transition",
+    badgeFrozen: "border-2 border-black bg-[#00f0ff]",
+    lockColor: "text-black",
   },
   {
     key: "action",
-    label: "действие",
-    colorClass: "bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
-    frozenClass: "bg-emerald-100 text-emerald-800 ring-1 ring-emerald-400",
-    textClass: "text-emerald-600",
+    label: "ДЕЙСТВИЕ",
+    textBg: "bg-[#ffe600]",
+    frozenTextBg: "bg-[#ffe600] border-2 border-black",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#ffe600]/20 transition",
+    badgeFrozen: "border-2 border-black bg-[#ffe600]",
+    lockColor: "text-black",
   },
   {
     key: "problem",
-    label: "задача",
-    colorClass: "bg-amber-50 text-amber-700 hover:bg-amber-100",
-    frozenClass: "bg-amber-100 text-amber-800 ring-1 ring-amber-400",
-    textClass: "text-amber-600",
+    label: "ЗАДАЧА",
+    textBg: "underline decoration-2",
+    frozenTextBg: "bg-black text-white px-1",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-black/5 transition",
+    badgeFrozen: "border-2 border-black bg-black text-white",
+    lockColor: "text-white",
   },
 ]
 
@@ -111,14 +124,12 @@ export default function GeneratorPage() {
     setTimeout(() => {
       const cur = currentRef.current
       const frz = frozenRef.current
-
       const pinned: PinnedBlocks = {
         productType: frz.productType && cur ? cur.productType : undefined,
         audience: frz.audience && cur ? cur.audience : undefined,
         action: frz.action && cur ? cur.action : undefined,
         problem: frz.problem && cur ? cur.problem : undefined,
       }
-
       const idea = generateIdea(recentTexts.current, pinned)
       recentTexts.current = [
         ...recentTexts.current.slice(-(RECENT_WINDOW - 1)),
@@ -156,12 +167,12 @@ export default function GeneratorPage() {
   const allFrozen = frozenCount === 4
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
-      <header className="border-b border-border/50 px-4 py-3">
+    <div className="min-h-screen bg-[#fff8d6] flex flex-col">
+      <header className="border-b-4 border-black bg-white px-4 py-3">
         <div className="max-w-2xl mx-auto flex items-center justify-between">
           <Link
             href="/"
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors font-mono"
+            className="inline-flex items-center gap-2 border-2 border-black bg-white px-3 py-1.5 font-mono text-sm font-black uppercase shadow-[2px_2px_0_0_#000] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none"
           >
             <ArrowLeft className="size-4" />
             random-idea
@@ -169,12 +180,15 @@ export default function GeneratorPage() {
           <button
             type="button"
             onClick={() => setShowSaved((v) => !v)}
-            className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            className={cn(
+              "inline-flex items-center gap-2 border-2 border-black px-3 py-1.5 text-sm font-black uppercase shadow-[2px_2px_0_0_#000] transition hover:translate-x-[1px] hover:translate-y-[1px] hover:shadow-none",
+              showSaved ? "bg-[#ffe600]" : "bg-white"
+            )}
           >
             <Bookmark className="size-4" />
             Сохранённые
             {saved.length > 0 && (
-              <span className="bg-zinc-900 text-white text-xs rounded-full px-1.5 py-0.5 font-medium leading-none">
+              <span className="border-2 border-black bg-black text-white text-xs px-1.5 py-0.5 font-black leading-none">
                 {saved.length}
               </span>
             )}
@@ -186,40 +200,51 @@ export default function GeneratorPage() {
         <div className="max-w-2xl mx-auto w-full px-4 py-10 flex flex-col gap-6">
           <div
             className={cn(
-              "min-h-44 rounded-2xl border border-border bg-card p-8 flex items-center justify-center transition-all duration-150",
+              "border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000] transition-all duration-150 min-h-44 flex items-center justify-center",
               isAnimating ? "opacity-0 scale-[0.99]" : "opacity-100 scale-100"
             )}
           >
             {current ? (
-              <div className="text-center space-y-5">
-                <p className="text-xl sm:text-2xl font-medium leading-relaxed text-foreground">
+              <div className="text-center space-y-5 w-full">
+                <p className="text-xl sm:text-2xl font-medium leading-relaxed text-black">
                   {BLOCKS.map((block, i) => {
                     const value = current[block.key]
                     const isFrozen = frozen[block.key]
+                    const isProblem = block.key === "problem"
+
                     return (
                       <span key={block.key}>
-                        {i === 0 ? null : i === 2 ? (
-                          <span className="text-muted-foreground"> — помогает </span>
-                        ) : i === 1 ? (
-                          <span> для </span>
+                        {i === 1 && <span className="text-black/50"> для </span>}
+                        {i === 2 && <span className="text-black/50"> — помогает </span>}
+                        {i === 3 && <span> </span>}
+                        {isProblem ? (
+                          <span
+                            className={cn(
+                              "font-black text-black",
+                              isFrozen
+                                ? "bg-black text-white px-1"
+                                : "underline decoration-2 decoration-black"
+                            )}
+                          >
+                            {value}
+                          </span>
                         ) : (
-                          <span> </span>
+                          <span
+                            className={cn(
+                              "px-1 font-black text-black",
+                              block.textBg,
+                              isFrozen && "border-2 border-black"
+                            )}
+                          >
+                            {value}
+                          </span>
                         )}
-                        <span
-                          className={cn(
-                            block.textClass,
-                            "font-semibold",
-                            isFrozen && "underline decoration-dotted underline-offset-4 decoration-2"
-                          )}
-                        >
-                          {value}
-                        </span>
                       </span>
                     )
                   })}
                 </p>
 
-                <div className="flex flex-wrap gap-1.5 justify-center">
+                <div className="flex flex-wrap gap-2 justify-center">
                   {BLOCKS.map((block) => {
                     const isFrozen = frozen[block.key]
                     return (
@@ -227,16 +252,20 @@ export default function GeneratorPage() {
                         key={block.key}
                         type="button"
                         onClick={() => toggleFreeze(block.key)}
-                        title={isFrozen ? `Разморозить «${block.label}»` : `Заморозить «${block.label}»`}
+                        title={
+                          isFrozen
+                            ? `Разморозить «${block.label.toLowerCase()}»`
+                            : `Заморозить «${block.label.toLowerCase()}»`
+                        }
                         className={cn(
-                          "inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full transition-all",
-                          isFrozen ? block.frozenClass : block.colorClass
+                          "inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-black uppercase",
+                          isFrozen ? block.badgeFrozen : block.badgeNormal
                         )}
                       >
                         {isFrozen ? (
-                          <Lock className="size-3 shrink-0" />
+                          <Lock className={cn("size-3 shrink-0", block.lockColor)} />
                         ) : (
-                          <LockOpen className="size-3 shrink-0 opacity-40" />
+                          <LockOpen className="size-3 shrink-0 opacity-30" />
                         )}
                         {block.label}
                       </button>
@@ -245,20 +274,20 @@ export default function GeneratorPage() {
                 </div>
 
                 {frozenCount > 0 && (
-                  <p className="text-xs text-muted-foreground">
-                    {frozenCount === 4
+                  <p className="text-xs font-medium text-black/50 uppercase tracking-wide">
+                    {allFrozen
                       ? "Все блоки заморожены — разморозь хотя бы один"
                       : `${frozenCount} ${frozenCount === 1 ? "блок заморожен" : "блока заморожено"} — при генерации ${frozenCount === 1 ? "он" : "они"} не изменятся`}
                   </p>
                 )}
               </div>
             ) : (
-              <div className="text-center space-y-2">
-                <p className="text-lg text-muted-foreground">
+              <div className="text-center space-y-3">
+                <p className="text-lg font-medium text-black/60">
                   Нажми кнопку, чтобы получить первую идею
                 </p>
-                <p className="text-sm text-muted-foreground/60">
-                  Идея собирается из 4 блоков — каждый можно заморозить
+                <p className="text-sm font-medium text-black/40 uppercase tracking-wide">
+                  4 блока · 120 000+ комбинаций · заморозка блоков
                 </p>
               </div>
             )}
@@ -270,10 +299,10 @@ export default function GeneratorPage() {
               onClick={handleGenerate}
               disabled={allFrozen}
               className={cn(
-                "flex-1 inline-flex items-center justify-center gap-2 h-12 rounded-xl text-base font-semibold transition-all",
+                "flex-1 inline-flex items-center justify-center gap-2 h-12 border-2 border-black font-black text-base uppercase transition",
                 allFrozen
-                  ? "bg-zinc-200 text-zinc-400 cursor-not-allowed"
-                  : "bg-zinc-900 text-white hover:bg-zinc-800 active:scale-[0.98]"
+                  ? "bg-black/10 text-black/30 cursor-not-allowed border-black/30"
+                  : "bg-[#ffe600] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
               )}
             >
               <Shuffle className="size-4" />
@@ -285,10 +314,10 @@ export default function GeneratorPage() {
                 onClick={handleSave}
                 disabled={isCurrentSaved}
                 className={cn(
-                  "inline-flex items-center justify-center gap-2 h-12 px-5 rounded-xl border text-base font-medium transition-all",
+                  "inline-flex items-center justify-center gap-2 h-12 px-5 border-2 border-black font-black text-base uppercase transition",
                   isCurrentSaved
-                    ? "border-emerald-200 bg-emerald-50 text-emerald-700 cursor-default"
-                    : "border-border bg-background text-foreground hover:bg-muted active:scale-[0.98]"
+                    ? "bg-[#ff5c8a] text-black cursor-default"
+                    : "bg-[#00f0ff] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
                 )}
               >
                 {isCurrentSaved ? (
@@ -307,90 +336,96 @@ export default function GeneratorPage() {
           </div>
 
           {sessionCount > 0 && (
-            <p className="text-center text-sm text-muted-foreground">
-              За эту сессию:{" "}
-              <span className="font-medium text-foreground">{sessionCount}</span>{" "}
+            <p className="text-center text-sm font-bold uppercase text-black/40 tracking-wide">
+              За сессию:{" "}
+              <span className="text-black">
+                {sessionCount}
+              </span>{" "}
               {sessionCount === 1 ? "идея" : sessionCount < 5 ? "идеи" : "идей"}
             </p>
           )}
         </div>
 
         {showSaved && (
-          <div className="border-t border-border/50 bg-muted/30 flex-1">
+          <div className="border-t-4 border-black bg-white flex-1">
             <div className="max-w-2xl mx-auto w-full px-4 py-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h2 className="font-semibold text-foreground">
+                <h2 className="font-black uppercase text-lg">
                   Сохранённые идеи
                 </h2>
-                <div className="flex gap-1 bg-background border border-border rounded-lg p-1">
+                <div className="flex gap-0 border-2 border-black">
                   <button
                     type="button"
                     onClick={() => setFilter("all")}
                     className={cn(
-                      "px-3 py-1 text-sm rounded-md transition-colors",
+                      "px-4 py-1.5 text-xs font-black uppercase transition",
                       filter === "all"
-                        ? "bg-zinc-900 text-white"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "bg-black text-white"
+                        : "bg-white text-black hover:bg-[#ffe600]"
                     )}
                   >
                     Все ({saved.length})
                   </button>
+                  <div className="w-px bg-black" />
                   <button
                     type="button"
                     onClick={() => setFilter("favorites")}
                     className={cn(
-                      "px-3 py-1 text-sm rounded-md transition-colors",
+                      "px-4 py-1.5 text-xs font-black uppercase transition",
                       filter === "favorites"
-                        ? "bg-zinc-900 text-white"
-                        : "text-muted-foreground hover:text-foreground"
+                        ? "bg-black text-white"
+                        : "bg-white text-black hover:bg-[#ffe600]"
                     )}
                   >
-                    Избранное ({favoritesCount})
+                    ★ Избранное ({favoritesCount})
                   </button>
                 </div>
               </div>
 
               {filteredSaved.length === 0 ? (
-                <p className="text-center text-muted-foreground py-10 text-sm">
-                  {filter === "favorites"
-                    ? "Нет идей в избранном. Отметь звёздочкой лучшие."
-                    : "Пока нет сохранённых идей. Нажми «Сохранить» после генерации."}
-                </p>
+                <div className="border-2 border-black bg-[#fff8d6] p-8 text-center">
+                  <p className="font-medium text-black/60">
+                    {filter === "favorites"
+                      ? "Нет избранных — отметь звёздочкой лучшие"
+                      : "Нет сохранённых идей — нажми «Сохранить» после генерации"}
+                  </p>
+                </div>
               ) : (
-                <ul className="space-y-2">
+                <ul className="space-y-3">
                   {filteredSaved.map((idea) => (
                     <li
                       key={idea.id}
-                      className="flex items-start gap-3 p-4 rounded-xl bg-background border border-border/60"
+                      className="flex items-start gap-3 border-2 border-black bg-[#fff8d6] p-4 shadow-[3px_3px_0_0_#000]"
                     >
-                      <p className="flex-1 text-sm leading-relaxed text-foreground">
+                      <p className="flex-1 text-sm font-medium leading-relaxed text-black">
                         {idea.text}
                       </p>
                       <div className="flex gap-1 shrink-0 mt-0.5">
                         <button
                           type="button"
                           onClick={() => toggleFavorite(idea.id)}
-                          className="p-1.5 rounded-lg hover:bg-muted transition-colors"
-                          title={
-                            idea.favorite ? "Убрать из избранного" : "В избранное"
-                          }
+                          className={cn(
+                            "border-2 border-black p-1.5 transition hover:translate-x-[1px] hover:translate-y-[1px]",
+                            idea.favorite ? "bg-[#ffe600]" : "bg-white"
+                          )}
+                          title={idea.favorite ? "Убрать из избранного" : "В избранное"}
                         >
                           <Star
                             className={cn(
                               "size-4",
                               idea.favorite
-                                ? "text-amber-500 fill-amber-500"
-                                : "text-muted-foreground"
+                                ? "text-black fill-black"
+                                : "text-black/40"
                             )}
                           />
                         </button>
                         <button
                           type="button"
                           onClick={() => deleteIdea(idea.id)}
-                          className="p-1.5 rounded-lg hover:bg-red-50 hover:text-red-500 transition-colors text-muted-foreground"
+                          className="border-2 border-black bg-white p-1.5 transition hover:bg-[#ff5c8a] hover:translate-x-[1px] hover:translate-y-[1px]"
                           title="Удалить"
                         >
-                          <Trash2 className="size-4" />
+                          <Trash2 className="size-4 text-black" />
                         </button>
                       </div>
                     </li>

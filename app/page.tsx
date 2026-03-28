@@ -1,18 +1,20 @@
 import Link from "next/link"
 import type { Metadata } from "next"
 import {
-  Shuffle,
+  ArrowRight,
+  Check,
   Clock,
-  Lightbulb,
-  Target,
-  Zap,
-  CheckCircle,
-  Users,
   Code2,
+  Layers,
   Palette,
+  Rocket,
+  Shuffle,
+  Sparkles,
+  Star,
   BarChart3,
-  Quote,
 } from "lucide-react"
+import { FadeIn } from "./_landing/FadeIn"
+import { FAQAccordion } from "./_landing/FAQAccordion"
 
 export const metadata: Metadata = {
   title: "random-idea — генератор идей для стартапа",
@@ -39,122 +41,156 @@ export default function LandingPage() {
 
 function HeroSection() {
   return (
-    <section className="min-h-screen bg-zinc-950 text-white flex flex-col">
-      <nav className="px-6 py-4 border-b border-zinc-800/60">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <span className="font-mono text-sm font-medium text-zinc-400 tracking-tight">
-            random-idea
-          </span>
-          <Link
-            href="/generator"
-            className="text-sm text-zinc-400 hover:text-white transition-colors flex items-center gap-1"
-          >
-            Открыть генератор →
-          </Link>
-        </div>
+    <section className="relative overflow-hidden border-b-4 border-black bg-[#ff5c8a] py-20 sm:py-28">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(135deg,transparent_0%,transparent_45%,rgba(0,0,0,0.07)_45%,rgba(0,0,0,0.07)_55%,transparent_55%,transparent_100%)]" />
+      <div className="pointer-events-none absolute right-8 top-12 hidden size-20 border-4 border-black bg-[#ffe600] sm:block" />
+      <div className="pointer-events-none absolute bottom-10 left-8 hidden size-14 border-4 border-black bg-[#00f0ff] sm:block" />
+
+      <nav className="relative mx-auto mb-12 flex max-w-5xl items-center justify-between px-6">
+        <span className="font-mono text-sm font-black uppercase tracking-tight text-black">
+          random-idea
+        </span>
+        <Link
+          href="/generator"
+          className="inline-flex items-center gap-1 border-2 border-black bg-white px-3 py-1.5 text-sm font-black uppercase shadow-[3px_3px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+        >
+          Открыть генератор
+          <ArrowRight className="size-3.5" />
+        </Link>
       </nav>
 
-      <div className="flex-1 flex items-center justify-center px-6 py-16">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <div className="inline-flex items-center gap-2 bg-zinc-800/80 border border-zinc-700/50 text-zinc-300 rounded-full px-4 py-1.5 text-sm">
-            <span className="size-1.5 bg-emerald-400 rounded-full shrink-0" />
-            Бесплатно · Без регистрации · Сразу к делу
+      <div className="relative mx-auto max-w-5xl px-6">
+        <FadeIn>
+          <div className="flex flex-col items-center gap-8 text-center">
+            <div className="inline-flex items-center gap-2 border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              <Sparkles className="size-4" />
+              Генератор идей для стартапа
+            </div>
+
+            <h1 className="max-w-4xl font-black uppercase tracking-tight text-4xl leading-[1.05] sm:text-5xl md:text-6xl lg:text-7xl">
+              Придумай идею за 5 минут,{" "}
+              <span className="bg-[#00f0ff] px-2 text-black">
+                даже если кажется,
+              </span>{" "}
+              что всё уже придумано
+            </h1>
+
+            <div className="max-w-2xl border-2 border-black bg-white p-4 font-medium shadow-[4px_4px_0_0_#000]">
+              random-idea собирает концепты из продуманных смысловых блоков —
+              получай нестандартные идеи и быстро отбирай лучшие для запуска.
+            </div>
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Link
+                href="/generator"
+                className="inline-flex h-12 items-center justify-center gap-2 border-2 border-black bg-[#ffe600] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              >
+                <Shuffle className="size-4" />
+                Сгенерировать первую идею
+              </Link>
+              <a
+                href="#how-it-works"
+                className="inline-flex h-12 items-center justify-center gap-2 border-2 border-black bg-[#00f0ff] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              >
+                Посмотреть, как работает
+              </a>
+            </div>
+
+            <div className="flex flex-wrap justify-center gap-3">
+              {[
+                { icon: <Clock className="size-4" />, text: "5 минут до первой идеи" },
+                { icon: <Layers className="size-4" />, text: "120 000+ комбинаций" },
+                { icon: <Star className="size-4" />, text: "Бесплатно" },
+              ].map((tag) => (
+                <span
+                  key={tag.text}
+                  className="flex items-center gap-2 border-2 border-black bg-white px-3 py-2 text-sm font-bold uppercase shadow-[3px_3px_0_0_#000]"
+                >
+                  {tag.icon}
+                  {tag.text}
+                </span>
+              ))}
+            </div>
+
+            <div className="w-full max-w-xl border-2 border-black bg-white p-5 text-left shadow-[4px_4px_0_0_#000]">
+              <p className="mb-3 font-mono text-xs font-black uppercase text-black/40">
+                Пример сгенерированной идеи
+              </p>
+              <p className="text-base font-medium leading-relaxed">
+                <span className="bg-[#ff5c8a] px-1 font-black text-black">
+                  Telegram-бот
+                </span>{" "}
+                для{" "}
+                <span className="bg-[#00f0ff] px-1 font-black text-black">
+                  соло-разработчиков
+                </span>{" "}
+                — помогает{" "}
+                <span className="bg-[#ffe600] px-1 font-black text-black">
+                  автоматизировать
+                </span>{" "}
+                <span className="font-black text-black underline decoration-2">
+                  рутинную отчётность и документирование
+                </span>
+              </p>
+              <div className="mt-3 flex flex-wrap gap-1.5">
+                {["продукт", "аудитория", "действие", "задача"].map((b) => (
+                  <span
+                    key={b}
+                    className="border border-black/20 px-2 py-0.5 text-xs font-medium text-black/50"
+                  >
+                    {b}
+                  </span>
+                ))}
+              </div>
+            </div>
           </div>
-
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.15] tracking-tight text-white">
-            Придумай идею стартапа за 5 минут, даже если кажется, что{" "}
-            <span className="text-amber-400">всё уже придумано</span>
-          </h1>
-
-          <p className="text-lg sm:text-xl text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            random-idea собирает новые концепты из продуманных смысловых блоков
-            и помогает быстро выбрать лучшие варианты для запуска.
-          </p>
-
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link
-              href="/generator"
-              className="inline-flex items-center justify-center gap-2 bg-white text-zinc-900 rounded-xl px-7 py-3.5 text-base font-semibold hover:bg-zinc-100 active:scale-[0.98] transition-all"
-            >
-              <Shuffle className="size-4 shrink-0" />
-              Сгенерировать первую идею
-            </Link>
-            <a
-              href="#how-it-works"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-800 border border-zinc-700/60 text-zinc-300 rounded-xl px-7 py-3.5 text-base font-medium hover:bg-zinc-700 transition-colors"
-            >
-              Посмотреть, как это работает
-            </a>
-          </div>
-
-          <p className="text-sm text-zinc-500">
-            Бесплатно. Без сложного онбординга. Начать можно сразу.
-          </p>
-
-          <IdeaPreviewCard />
-        </div>
+        </FadeIn>
       </div>
     </section>
   )
 }
 
-function IdeaPreviewCard() {
-  return (
-    <div className="mt-4 max-w-xl mx-auto bg-zinc-900 border border-zinc-700/60 rounded-2xl p-6 text-left">
-      <p className="text-base sm:text-lg leading-relaxed font-medium">
-        <span className="text-violet-400">Telegram-бот</span> для{" "}
-        <span className="text-blue-400">соло-разработчиков</span> — помогает{" "}
-        <span className="text-emerald-400">автоматизировать</span>{" "}
-        <span className="text-amber-400">рутинную отчётность и документирование</span>
-      </p>
-      <div className="flex flex-wrap gap-1.5 mt-3">
-        <span className="bg-violet-950/60 text-violet-400 border border-violet-800/40 text-xs px-2 py-0.5 rounded-full">продукт</span>
-        <span className="bg-blue-950/60 text-blue-400 border border-blue-800/40 text-xs px-2 py-0.5 rounded-full">аудитория</span>
-        <span className="bg-emerald-950/60 text-emerald-400 border border-emerald-800/40 text-xs px-2 py-0.5 rounded-full">действие</span>
-        <span className="bg-amber-950/60 text-amber-400 border border-amber-800/40 text-xs px-2 py-0.5 rounded-full">задача</span>
-      </div>
-      <p className="text-xs text-zinc-600 mt-3">← пример сгенерированной идеи</p>
-    </div>
-  )
-}
-
 function ProblemSection() {
   const items = [
-    {
-      icon: <Clock className="size-5 text-red-500" />,
-      text: "Идеи крутятся вокруг одних и тех же шаблонов.",
-    },
-    {
-      icon: <Zap className="size-5 text-red-500" />,
-      text: "На брейншторм уходит время, а ясности всё равно мало.",
-    },
-    {
-      icon: <Target className="size-5 text-red-500" />,
-      text: "Трудно быстро собрать пул вариантов для выбора.",
-    },
+    "Идеи крутятся вокруг одних и тех же шаблонов.",
+    "На брейншторм уходит время, а ясности всё равно мало.",
+    "Трудно быстро собрать пул вариантов для выбора.",
   ]
 
   return (
-    <section className="py-20 px-6 bg-zinc-50">
-      <div className="max-w-4xl mx-auto space-y-12">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Пустой лист убивает скорость запуска
-          </h2>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-4">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-6 border border-zinc-200 space-y-3 shadow-sm"
-            >
-              <div className="size-9 rounded-lg bg-red-50 flex items-center justify-center">
-                {item.icon}
-              </div>
-              <p className="text-zinc-700 leading-relaxed">{item.text}</p>
+    <section className="border-b-4 border-black bg-[#ffe600] py-20 sm:py-28">
+      <div className="mx-auto max-w-4xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              Проблема
             </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Пустой лист убивает скорость запуска
+            </h2>
+          </div>
+        </FadeIn>
+
+        <div className="space-y-4">
+          {items.map((text, i) => (
+            <FadeIn key={text} delay={i * 0.1}>
+              <div className="flex items-start gap-4 border-2 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+                <div className="mt-0.5 flex size-6 shrink-0 items-center justify-center border-2 border-black bg-[#ff5c8a] text-xs font-black text-black">
+                  ✕
+                </div>
+                <p className="font-medium text-black">{text}</p>
+              </div>
+            </FadeIn>
           ))}
         </div>
+
+        <FadeIn delay={0.35}>
+          <div className="mt-8 border-4 border-black bg-[#00f0ff] p-6 text-center shadow-[6px_6px_0_0_#000]">
+            <p className="font-black text-lg uppercase">
+              Нужен поток идей — быстро, структурированно, без прокрастинации
+            </p>
+          </div>
+        </FadeIn>
       </div>
     </section>
   )
@@ -162,72 +198,90 @@ function ProblemSection() {
 
 function SolutionSection() {
   return (
-    <section className="py-20 px-6 bg-white">
-      <div className="max-w-4xl mx-auto">
-        <div className="grid md:grid-cols-2 gap-12 items-center">
-          <div className="space-y-6">
-            <div className="inline-flex items-center gap-2 bg-emerald-50 text-emerald-700 rounded-full px-3 py-1 text-sm font-medium">
-              <Lightbulb className="size-3.5" />
+    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+      <div className="mx-auto max-w-5xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-[#ffe600] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
               Решение
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900 leading-tight">
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
               Генератор, который расширяет рамки мышления
             </h2>
-            <p className="text-zinc-600 leading-relaxed text-lg">
+            <p className="mx-auto mt-4 max-w-2xl font-medium text-black/80">
               Ты получаешь идеи как конструктор: из комбинаций ниши, аудитории,
-              проблемы, ценности и механики решения. Это даёт неожиданные, но
-              понятные направления для следующего проекта.
+              проблемы, ценности и механики решения.
             </p>
-            <Link
-              href="/generator"
-              className="inline-flex items-center justify-center gap-2 bg-zinc-900 text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
-            >
-              <Shuffle className="size-4" />
-              Попробовать генерацию
-            </Link>
           </div>
+        </FadeIn>
 
-          <div className="space-y-3">
-            <div className="bg-zinc-50 border border-zinc-200 rounded-2xl p-5 space-y-2">
-              <p className="text-xs text-zinc-400 font-mono uppercase tracking-wide">Смысловые блоки</p>
-              <div className="flex flex-wrap gap-2">
-                {[
-                  { label: "продукт", color: "violet" },
-                  { label: "аудитория", color: "blue" },
-                  { label: "действие", color: "emerald" },
-                  { label: "задача", color: "amber" },
-                ].map((b) => (
-                  <span
-                    key={b.label}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-medium border
-                      ${b.color === "violet" ? "bg-violet-50 text-violet-700 border-violet-200" : ""}
-                      ${b.color === "blue" ? "bg-blue-50 text-blue-700 border-blue-200" : ""}
-                      ${b.color === "emerald" ? "bg-emerald-50 text-emerald-700 border-emerald-200" : ""}
-                      ${b.color === "amber" ? "bg-amber-50 text-amber-700 border-amber-200" : ""}
-                    `}
-                  >
-                    {b.label}
+        <div className="grid items-center gap-10 md:grid-cols-2">
+          <FadeIn delay={0.1}>
+            <div className="space-y-5">
+              <p className="font-medium text-black/80 text-lg leading-relaxed">
+                Это даёт неожиданные, но понятные направления для следующего
+                проекта. Никаких пустых листов — только конкретные концепты для
+                оценки.
+              </p>
+              <Link
+                href="/generator"
+                className="inline-flex h-12 items-center gap-2 border-2 border-black bg-[#ffe600] px-8 font-black text-base uppercase shadow-[4px_4px_0_0_#000] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+              >
+                <Shuffle className="size-4" />
+                Попробовать генерацию
+              </Link>
+            </div>
+          </FadeIn>
+
+          <FadeIn delay={0.2}>
+            <div className="space-y-3">
+              <div className="border-2 border-black bg-white p-5 shadow-[4px_4px_0_0_#000]">
+                <p className="mb-3 font-mono text-xs font-black uppercase text-black/40">
+                  4 смысловых блока
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {[
+                    { label: "продукт", bg: "bg-[#ff5c8a]" },
+                    { label: "аудитория", bg: "bg-[#00f0ff]" },
+                    { label: "действие", bg: "bg-[#ffe600]" },
+                    { label: "задача", bg: "bg-white border border-black" },
+                  ].map((b) => (
+                    <span
+                      key={b.label}
+                      className={`${b.bg} border-2 border-black px-3 py-1.5 text-sm font-black uppercase shadow-[2px_2px_0_0_#000]`}
+                    >
+                      {b.label}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 text-sm font-bold uppercase text-black/50">
+                <span className="h-px flex-1 bg-black/20" />
+                120 000+ комбинаций
+                <span className="h-px flex-1 bg-black/20" />
+              </div>
+
+              <div className="border-2 border-black bg-[#111111] p-5 shadow-[4px_4px_0_0_#000]">
+                <p className="text-sm font-medium leading-relaxed">
+                  <span className="bg-[#ff5c8a] px-1 font-black text-black">
+                    Figma-плагин
+                  </span>{" "}
+                  <span className="text-white">для</span>{" "}
+                  <span className="bg-[#00f0ff] px-1 font-black text-black">
+                    UI/UX-дизайнеров
+                  </span>{" "}
+                  <span className="text-white/60">— помогает</span>{" "}
+                  <span className="bg-[#ffe600] px-1 font-black text-black">
+                    персонализировать
+                  </span>{" "}
+                  <span className="font-black text-white underline decoration-2">
+                    онбординг новых пользователей
                   </span>
-                ))}
+                </p>
               </div>
             </div>
-            <div className="flex items-center justify-center gap-2 text-zinc-400">
-              <span className="h-px flex-1 bg-zinc-200" />
-              <span className="text-sm">120 000+ комбинаций</span>
-              <span className="h-px flex-1 bg-zinc-200" />
-            </div>
-            <div className="bg-zinc-900 rounded-2xl p-5">
-              <p className="text-white text-sm leading-relaxed">
-                <span className="text-violet-400 font-medium">Figma-плагин</span> для{" "}
-                <span className="text-blue-400 font-medium">UI/UX-дизайнеров</span> —
-                помогает{" "}
-                <span className="text-emerald-400 font-medium">персонализировать</span>{" "}
-                <span className="text-amber-400 font-medium">
-                  онбординг новых пользователей
-                </span>
-              </p>
-            </div>
-          </div>
+          </FadeIn>
         </div>
       </div>
     </section>
@@ -238,49 +292,67 @@ function HowItWorksSection() {
   const steps = [
     {
       num: "01",
-      title: 'Нажми "Сгенерировать"',
-      desc: "Получи первую идею за секунду. Никаких форм, настроек и онбординга.",
+      text: 'Нажми "Сгенерировать" и получи первую идею — никаких форм и онбординга.',
     },
     {
       num: "02",
-      title: "Прокрути несколько вариантов",
-      desc: "Отметь лучшие звёздочкой или сохрани всё что понравилось.",
+      text: "Прокрути несколько вариантов. Понравился блок — заморозь его, чтобы он не менялся.",
     },
     {
       num: "03",
-      title: "Выбери 1–3 для проверки",
-      desc: "Переходи к интервью с пользователями и валидации — без лишних шагов.",
+      text: "Сохрани лучшие, выбери 1–3 и переходи к проверке через интервью.",
     },
   ]
 
   return (
-    <section id="how-it-works" className="py-20 px-6 bg-zinc-50">
-      <div className="max-w-4xl mx-auto space-y-12">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Три шага до рабочей заготовки идеи
-          </h2>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-6">
-          {steps.map((step) => (
-            <div key={step.num} className="space-y-4">
-              <span className="font-mono text-5xl font-bold text-zinc-200">
-                {step.num}
-              </span>
-              <h3 className="text-lg font-semibold text-zinc-900">{step.title}</h3>
-              <p className="text-zinc-600 leading-relaxed">{step.desc}</p>
+    <section
+      id="how-it-works"
+      className="border-b-4 border-black bg-[#00f0ff] py-20 sm:py-28"
+    >
+      <div className="mx-auto max-w-3xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              Как это работает
             </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Три шага до рабочей заготовки идеи
+            </h2>
+          </div>
+        </FadeIn>
+
+        <div className="space-y-8">
+          {steps.map((step, i) => (
+            <FadeIn key={step.num} delay={i * 0.12}>
+              <div className="flex items-start gap-5">
+                <div className="relative flex w-14 shrink-0 justify-center">
+                  <div className="flex size-14 items-center justify-center border-2 border-black bg-[#ff5c8a] font-mono font-black text-black text-lg">
+                    {step.num}
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div className="absolute top-14 left-1/2 hidden h-[calc(100%+2rem)] w-1 -translate-x-1/2 bg-black sm:block" />
+                  )}
+                </div>
+                <div className="flex-1 border-2 border-black bg-white p-4 shadow-[4px_4px_0_0_#000]">
+                  <p className="font-medium text-base leading-relaxed">
+                    {step.text}
+                  </p>
+                </div>
+              </div>
+            </FadeIn>
           ))}
         </div>
-        <div className="text-center">
-          <Link
-            href="/generator"
-            className="inline-flex items-center justify-center gap-2 bg-zinc-900 text-white rounded-xl px-6 py-3 text-sm font-semibold hover:bg-zinc-800 transition-colors"
-          >
-            <Shuffle className="size-4" />
-            Попробовать прямо сейчас
-          </Link>
-        </div>
+
+        <FadeIn delay={0.4}>
+          <div className="mt-10 border-4 border-black bg-white p-6 text-center shadow-[6px_6px_0_0_#000]">
+            <div className="mb-3 flex justify-center">
+              <Clock className="size-6 text-black" />
+            </div>
+            <p className="font-black text-lg uppercase">
+              Первая идея — меньше чем за 20 секунд
+            </p>
+          </div>
+        </FadeIn>
       </div>
     </section>
   )
@@ -288,30 +360,53 @@ function HowItWorksSection() {
 
 function ValueSection() {
   const items = [
-    "Быстро получаешь много вариантов вместо одной «идеальной» идеи.",
-    "Выходишь из творческого тупика без долгих сессий.",
-    "Сразу формируешь короткий список для дальнейших интервью и проверки.",
+    {
+      title: "Много вариантов быстро",
+      desc: "Получаешь поток идей вместо одной «идеальной» — скорость важнее совершенства.",
+    },
+    {
+      title: "Выход из творческого тупика",
+      desc: "Комбинаторный подход ломает привычные шаблоны и открывает неожиданные направления.",
+    },
+    {
+      title: "Готовый список для проверки",
+      desc: "Сразу формируй шортлист для интервью с пользователями и дальнейшей валидации.",
+    },
+    {
+      title: "Заморозка блоков",
+      desc: "Понравилась аудитория или механика — зафиксируй блок и перебирай остальные.",
+    },
   ]
 
   return (
-    <section className="py-20 px-6 bg-white">
-      <div className="max-w-3xl mx-auto space-y-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Почему это полезно
-          </h2>
-        </div>
-        <ul className="space-y-4">
+    <section className="border-b-4 border-black bg-[#ffe600] py-20 sm:py-28">
+      <div className="mx-auto max-w-4xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              Ценность
+            </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Почему это полезно
+            </h2>
+          </div>
+        </FadeIn>
+
+        <div className="grid gap-5 sm:grid-cols-2">
           {items.map((item, i) => (
-            <li
-              key={i}
-              className="flex items-start gap-4 p-5 bg-zinc-50 rounded-2xl border border-zinc-200"
-            >
-              <CheckCircle className="size-5 text-emerald-500 mt-0.5 shrink-0" />
-              <p className="text-zinc-700 text-lg leading-relaxed">{item}</p>
-            </li>
+            <FadeIn key={item.title} delay={i * 0.08}>
+              <div className="flex items-start gap-4 border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000]">
+                <div className="mt-1 flex size-8 shrink-0 items-center justify-center border-2 border-black bg-[#00f0ff]">
+                  <Check className="size-4 text-black" />
+                </div>
+                <div>
+                  <h3 className="mb-1 font-black uppercase">{item.title}</h3>
+                  <p className="text-sm font-medium text-black/80">{item.desc}</p>
+                </div>
+              </div>
+            </FadeIn>
           ))}
-        </ul>
+        </div>
       </div>
     </section>
   )
@@ -322,40 +417,50 @@ function ForWhomSection() {
     {
       icon: <Code2 className="size-5" />,
       title: "Инди-хакеры и соло-разработчики",
-      desc: "Регулярно ищешь идею для нового микро-SaaS или пет-проекта — генератор даёт быстрый старт.",
+      desc: "Регулярно ищешь идею для нового микро-SaaS — генератор даёт быстрый старт без прокрастинации.",
+      gradient: "from-amber-500 to-orange-500",
     },
     {
-      icon: <Zap className="size-5" />,
+      icon: <Layers className="size-5" />,
       title: "Вайбкодеры и создатели пет-проектов",
-      desc: "Хочешь быстро собрать прототип, но не знаешь с чего начать — выбирай из потока свежих направлений.",
+      desc: "Хочешь собрать прототип, но не знаешь с чего начать — выбирай из потока свежих направлений.",
+      gradient: "from-pink-500 to-purple-500",
     },
     {
       icon: <Palette className="size-5" />,
       title: "Дизайнеры и аналитики",
-      desc: "Нужна заготовка концепта для тестирования или исследования — получай идеи без долгого брейншторма.",
+      desc: "Нужна заготовка концепта для тестирования — получай идеи без долгого брейншторма.",
+      gradient: "from-indigo-500 to-blue-500",
     },
   ]
 
   return (
-    <section className="py-20 px-6 bg-zinc-50">
-      <div className="max-w-4xl mx-auto space-y-12">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Сделано для тех, кто запускает новое
-          </h2>
-        </div>
-        <div className="grid sm:grid-cols-3 gap-5">
-          {segments.map((s, i) => (
-            <div
-              key={i}
-              className="bg-white rounded-2xl p-6 border border-zinc-200 space-y-3 shadow-sm"
-            >
-              <div className="size-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-700">
-                {s.icon}
-              </div>
-              <h3 className="font-semibold text-zinc-900">{s.title}</h3>
-              <p className="text-zinc-600 text-sm leading-relaxed">{s.desc}</p>
+    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+      <div className="mx-auto max-w-5xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-[#ffe600] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              Для кого
             </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Сделано для тех, кто запускает новое
+            </h2>
+          </div>
+        </FadeIn>
+
+        <div className="grid gap-6 sm:grid-cols-3">
+          {segments.map((s, i) => (
+            <FadeIn key={s.title} delay={i * 0.1}>
+              <div className="group border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000] transition-all hover:-translate-y-1">
+                <div
+                  className={`mb-4 inline-flex size-12 items-center justify-center border-2 border-black bg-gradient-to-br ${s.gradient} text-white`}
+                >
+                  {s.icon}
+                </div>
+                <h3 className="mb-2 font-black uppercase text-xl">{s.title}</h3>
+                <p className="text-sm font-medium text-black/80">{s.desc}</p>
+              </div>
+            </FadeIn>
           ))}
         </div>
       </div>
@@ -378,26 +483,31 @@ function SocialProofSection() {
   ]
 
   return (
-    <section className="py-20 px-6 bg-white">
-      <div className="max-w-4xl mx-auto space-y-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Первые пользователи уже собирают свои списки идей
-          </h2>
-        </div>
-        <div className="grid sm:grid-cols-2 gap-5">
-          {testimonials.map((t, i) => (
-            <div
-              key={i}
-              className="bg-zinc-50 border border-zinc-200 rounded-2xl p-6 space-y-4"
-            >
-              <Quote className="size-5 text-zinc-300" />
-              <p className="text-zinc-700 leading-relaxed">{t.text}</p>
-              <div>
-                <p className="font-semibold text-zinc-900 text-sm">{t.author}</p>
-                <p className="text-zinc-500 text-sm">{t.role}</p>
-              </div>
+    <section className="border-b-4 border-black bg-[#00f0ff] py-20 sm:py-28">
+      <div className="mx-auto max-w-4xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-white px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              Первые пользователи
             </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Уже собирают свои списки идей
+            </h2>
+          </div>
+        </FadeIn>
+
+        <div className="grid gap-6 md:grid-cols-2">
+          {testimonials.map((t, i) => (
+            <FadeIn key={t.author} delay={i * 0.1}>
+              <div className="border-2 border-black bg-white p-6 shadow-[5px_5px_0_0_#000]">
+                <div className="mb-4 font-black text-4xl leading-none text-black/20">"</div>
+                <p className="font-medium text-black leading-relaxed">{t.text}</p>
+                <div className="mt-5 border-t-2 border-black/10 pt-4">
+                  <p className="font-black uppercase text-sm">{t.author}</p>
+                  <p className="text-sm font-medium text-black/60">{t.role}</p>
+                </div>
+              </div>
+            </FadeIn>
           ))}
         </div>
       </div>
@@ -406,49 +516,20 @@ function SocialProofSection() {
 }
 
 function FAQSection() {
-  const items = [
-    {
-      q: "Это бесплатно?",
-      a: "Да, базовый доступ бесплатный. Регистрация не нужна — просто открываешь и генерируешь.",
-    },
-    {
-      q: "Это просто случайные фразы?",
-      a: "Нет. Идеи собираются из продуманной системы смысловых блоков: типы продуктов, аудитории, механики и задачи. Каждая комбинация осмыслена.",
-    },
-    {
-      q: "Подходит только разработчикам?",
-      a: "Нет, но в первой версии мы в первую очередь фокусируемся на создателях цифровых продуктов: разработчиках, дизайнерах, продуктовых аналитиках.",
-    },
-    {
-      q: "Что делать после генерации?",
-      a: "Выбрать 1–3 лучшие идеи и перейти к проверке через интервью с целевой аудиторией. Сохранённые идеи хранятся в браузере и не исчезнут.",
-    },
-  ]
-
   return (
-    <section className="py-20 px-6 bg-zinc-50">
-      <div className="max-w-2xl mx-auto space-y-10">
-        <div className="text-center space-y-3">
-          <h2 className="text-3xl sm:text-4xl font-bold text-zinc-900">
-            Частые вопросы
-          </h2>
-        </div>
-        <div className="space-y-3">
-          {items.map((item, i) => (
-            <details
-              key={i}
-              className="group bg-white border border-zinc-200 rounded-2xl overflow-hidden"
-            >
-              <summary className="flex items-center justify-between p-5 cursor-pointer font-semibold text-zinc-900 list-none select-none hover:bg-zinc-50 transition-colors">
-                {item.q}
-                <span className="ml-4 shrink-0 text-zinc-400 transition-transform group-open:rotate-45">
-                  +
-                </span>
-              </summary>
-              <p className="px-5 pb-5 text-zinc-600 leading-relaxed">{item.a}</p>
-            </details>
-          ))}
-        </div>
+    <section className="border-b-4 border-black bg-[#fff8d6] py-20 sm:py-28">
+      <div className="mx-auto max-w-2xl px-6">
+        <FadeIn>
+          <div className="mb-12 text-center">
+            <div className="mb-4 inline-block border-2 border-black bg-[#ff5c8a] px-4 py-1.5 font-black text-sm uppercase shadow-[3px_3px_0_0_#000]">
+              FAQ
+            </div>
+            <h2 className="font-black uppercase tracking-tight text-3xl sm:text-4xl">
+              Частые вопросы
+            </h2>
+          </div>
+        </FadeIn>
+        <FAQAccordion />
       </div>
     </section>
   )
@@ -456,25 +537,43 @@ function FAQSection() {
 
 function FinalCTASection() {
   return (
-    <section className="py-24 px-6 bg-zinc-950 text-white">
-      <div className="max-w-3xl mx-auto text-center space-y-8">
-        <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
-          Хватит ждать «идеальный инсайт» — собери рабочую идею прямо сейчас
-        </h2>
-        <p className="text-lg text-zinc-400 max-w-xl mx-auto leading-relaxed">
-          Открой random-idea и собери свой следующий стартап-концепт за несколько
-          минут.
-        </p>
-        <Link
-          href="/generator"
-          className="inline-flex items-center justify-center gap-2 bg-white text-zinc-900 rounded-xl px-8 py-4 text-base font-semibold hover:bg-zinc-100 active:scale-[0.98] transition-all"
-        >
-          <Shuffle className="size-5" />
-          Запустить генератор идей
-        </Link>
-        <p className="text-sm text-zinc-600">
-          Бесплатно · Без регистрации · 120 000+ комбинаций
-        </p>
+    <section className="relative overflow-hidden border-b-4 border-black bg-[#111111] py-24">
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(45deg,transparent_0%,transparent_40%,rgba(255,255,255,0.04)_40%,rgba(255,255,255,0.04)_50%,transparent_50%,transparent_100%)]" />
+      <div className="relative mx-auto max-w-3xl px-6 text-center">
+        <FadeIn>
+          <div className="mb-6 flex justify-center">
+            <Rocket className="size-10 text-[#ffe600]" />
+          </div>
+          <h2 className="mb-6 font-black uppercase tracking-tight text-3xl text-white sm:text-4xl lg:text-5xl leading-tight">
+            Хватит ждать «идеальный инсайт» —{" "}
+            <span className="bg-[#ffe600] px-2 text-black">
+              собери рабочую идею
+            </span>{" "}
+            прямо сейчас
+          </h2>
+          <p className="mx-auto mb-10 max-w-xl font-medium text-white/70">
+            Открой random-idea и собери свой следующий стартап-концепт за
+            несколько минут.
+          </p>
+          <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+            <Link
+              href="/generator"
+              className="inline-flex h-12 items-center gap-2 border-2 border-white bg-[#ffe600] px-8 font-black text-base text-black uppercase shadow-[4px_4px_0_0_#ffe600] transition hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+            >
+              <Shuffle className="size-4" />
+              Запустить генератор идей
+            </Link>
+            <a
+              href="#how-it-works"
+              className="inline-flex h-12 items-center gap-2 border-2 border-white bg-transparent px-8 font-black text-base text-white uppercase shadow-[4px_4px_0_0_#00f0ff] transition hover:bg-white hover:text-black hover:shadow-none"
+            >
+              Как это работает
+            </a>
+          </div>
+          <p className="mt-8 text-sm font-medium text-white/40 uppercase tracking-wide">
+            Бесплатно · Без регистрации · 120 000+ комбинаций
+          </p>
+        </FadeIn>
       </div>
     </section>
   )
@@ -482,10 +581,14 @@ function FinalCTASection() {
 
 function SiteFooter() {
   return (
-    <footer className="py-6 px-6 bg-zinc-950 border-t border-zinc-800/60">
-      <div className="max-w-5xl mx-auto flex items-center justify-between">
-        <span className="font-mono text-sm text-zinc-600">random-idea</span>
-        <span className="text-sm text-zinc-600">MVP · 2025</span>
+    <footer className="border-t-4 border-black bg-white py-6 px-6">
+      <div className="mx-auto max-w-5xl flex items-center justify-between">
+        <span className="font-mono text-sm font-black uppercase text-black/50">
+          random-idea
+        </span>
+        <span className="text-sm font-medium text-black/40 uppercase">
+          MVP · 2025
+        </span>
       </div>
     </footer>
   )
