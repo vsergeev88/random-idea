@@ -29,7 +29,7 @@ export const PRODUCT_TYPES = [
   "AI-поисковик по базе знаний",
   "Платформа для комьюнити",
   "Сервис мониторинга и алертов",
-]
+];
 
 export const AUDIENCES = [
   "соло-разработчиков",
@@ -62,7 +62,7 @@ export const AUDIENCES = [
   "менеджеров маркетплейсов",
   "агентств по лидогенерации",
   "команд поддержки клиентов",
-]
+];
 
 export const ACTIONS = [
   "автоматизировать",
@@ -90,7 +90,7 @@ export const ACTIONS = [
   "выявлять узкие места",
   "сегментировать и таргетировать",
   "снижать churn",
-]
+];
 
 export const PROBLEMS = [
   "рутинную отчётность и документирование",
@@ -123,4 +123,39 @@ export const PROBLEMS = [
   "контроль KPI и операционных метрик",
   "запуск и анализ экспериментов роста",
   "приоритизацию фич и продуктовых инициатив",
-]
+];
+
+export const SERVICES = [
+  "Netflix",
+  "Spotify",
+  "YouTube",
+  "TikTok",
+  "Amazon",
+  "Shopify",
+  "Wildberries",
+  "Etsy",
+  "Uber",
+  "Airbnb",
+  "GitHub",
+  "StackOverflow",
+  "Vercel",
+  "Notion",
+  "Slack",
+  "Trello",
+  "Figma",
+  "Canva",
+  "Stripe",
+  "PayPal",
+  "LinkedIn",
+  "Pinterest",
+  "Reddit",
+  "Duolingo",
+  "Coursera",
+  "Zapier",
+  "Calendly",
+  "Intercom",
+  "ChatGPT",
+  "Tinder",
+  "Instagram",
+  "Google Drive",
+];

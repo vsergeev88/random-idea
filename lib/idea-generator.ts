@@ -1,4 +1,4 @@
-import { PRODUCT_TYPES, AUDIENCES, ACTIONS, PROBLEMS } from "./idea-blocks"
+import { PRODUCT_TYPES, AUDIENCES, ACTIONS, PROBLEMS, SERVICES } from "./idea-blocks"
 
 export interface GeneratedIdea {
   id: string
@@ -48,6 +48,44 @@ export function generateIdea(
     audience,
     action,
     problem,
+    generatedAt: Date.now(),
+  }
+}
+
+export interface AnalogyIdea {
+  id: string
+  text: string
+  service: string
+  audience: string
+  generatedAt: number
+}
+
+export interface PinnedAnalogyBlocks {
+  service?: string
+  audience?: string
+}
+
+export function generateAnalogy(
+  recentTexts: string[] = [],
+  pinned: PinnedAnalogyBlocks = {}
+): AnalogyIdea {
+  let service: string
+  let audience: string
+  let text: string
+  let attempts = 0
+
+  do {
+    service = pinned.service ?? randomFrom(SERVICES)
+    audience = pinned.audience ?? randomFrom(AUDIENCES)
+    text = `${service} для ${audience}`
+    attempts++
+  } while (recentTexts.includes(text) && attempts < 20)
+
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    text,
+    service,
+    audience,
     generatedAt: Date.now(),
   }
 }
