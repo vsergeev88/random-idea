@@ -448,7 +448,7 @@ export default function GeneratorPage() {
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 className={cn(
-                  "inline-flex h-12 flex-1 items-center justify-center gap-2 border-2 border-black font-black text-base uppercase transition",
+                  "inline-flex min-h-12 flex-1 items-center justify-center gap-2 border-2 border-black font-black text-base uppercase transition",
                   allFrozen
                     ? "cursor-not-allowed border-black/30 bg-black/10 text-black/30"
                     : "bg-[#ffe600] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
