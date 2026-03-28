@@ -4,7 +4,13 @@
     "titleBar.activeBackground": "#3225B2",
     "titleBar.activeForeground": "#FAF9FE",
     "titleBar.inactiveBackground": "#241B7F",
-    "titleBar.inactiveForeground": "#FAF9FE"
+    "titleBar.inactiveForeground": "#FAF9FE",
+    "statusBar.background": "#241B7F",
+    "statusBar.foreground": "#FAF9FE",
+    "statusBar.debuggingBackground": "#241B7F",
+    "statusBar.debuggingForeground": "#FAF9FE",
+    "statusBar.noFolderBackground": "#241B7F",
+    "statusBar.noFolderForeground": "#FAF9FE"
   },
   "cSpell.words": [
     "Jetpack",

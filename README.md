@@ -1,213 +1,111 @@
-# Jetpack AI Starter Template
+# random-idea
 
-Jetpack is an opinionated, all-in-one AI starter boilerplate for vibe coders, programmers, and indie hackers. It helps you launch SaaS products in days, not weeks, with all essential tools preconfigured and a deep focus on AI tooling.
+Генератор идей для стартапа из продуманных смысловых блоков. Для инди-хакеров, вайбкодеров и всех, кто хочет сдвинуть мышление в новые направления.
 
-## Apply Your shadcn Theme
+## Быстрый старт
 
-To apply your shadcn theme, go to the theme builder at https://ui.shadcn.com/create, configure your theme, and copy the preset code. Then run in your terminal:
-
-```bash
-npx shadcn@latest init --preset <your-preset-name>
-```
-
-This will add a `components.json` file to your project, which will be used for component generation.
-
-## Neon Database Boilerplate
-
-The template includes a base layer for working with an external Neon Postgres database:
-
-- Neon client: `lib/neon.ts`
-- connection test API endpoint: `app/api/neon/route.ts`
-
-### 1) Configure Environment Variables
-
-Copy `.env.example` to `.env` and fill in:
+### 1) Установить зависимости
 
 ```bash
-NEON_CONNECTION_STRING=postgresql://<user>:<password>@<host>/<db>?sslmode=require
+npm install
 ```
 
-### 2) Check the Connection
+### 2) Настроить переменные окружения
 
-Start the app:
+```bash
+cp .env.example .env.local
+```
+
+Для базового MVP переменные окружения не обязательны — генератор работает без бэкенда и базы данных. Заполни `.env.local` только если нужны Clerk (авторизация) или Neon (БД).
+
+### 3) Запустить локально
 
 ```bash
 npm run dev
 ```
 
-Open the endpoint:
+Открой в браузере:
 
-- [http://localhost:3000/api/neon](http://localhost:3000/api/neon)
+- [http://localhost:3000](http://localhost:3000) — лендинг
+- [http://localhost:3000/generator](http://localhost:3000/generator) — генератор идей
 
-A successful response returns:
+---
 
-- `ok: true`
-- current database name
-- database server time
-- PostgreSQL version
+## Что реализовано в MVP
 
-### 3) Use in Your Server Handlers
+### Генератор (`/generator`)
+- Генерация идей из 4 смысловых блоков: тип продукта × аудитория × действие × задача
+- 120 000+ уникальных комбинаций
+- Контроль повторов: последние 5 идей не повторяются в сессии
+- Сохранение идей в localStorage (без регистрации)
+- Отметка избранных и фильтр «Избранное»
+- Удаление сохранённых идей
+- Счётчик идей за текущую сессию
 
-Import the client from `lib/neon.ts`:
+### Лендинг (`/`)
+- Hero с демо-примером идеи
+- Блок проблемы (3 тезиса)
+- Блок решения с визуализацией блоков
+- Блок «Как это работает» (3 шага)
+- Блок ценности (3 пункта)
+- Блок «Для кого» (3 сегмента)
+- Социальное доказательство (плейсхолдеры)
+- FAQ (4 вопроса)
+- Финальный CTA
 
-```ts
-import { getNeonClient } from "@/lib/neon";
+---
 
-const sql = getNeonClient();
-const rows = await sql`select now() as now`;
+## Структура смысловых блоков
+
+Файл: `lib/idea-blocks.ts`
+
+| Блок | Кол-во | Примеры |
+|------|--------|---------|
+| Тип продукта | 20 | SaaS-сервис, Telegram-бот, AI-ассистент |
+| Аудитория | 20 | соло-разработчики, фрилансеры, data-аналитики |
+| Действие | 15 | автоматизировать, монетизировать, геймифицировать |
+| Задача | 20 | рутинная отчётность, поиск лидов, ревью кода |
+
+Формула: `[Продукт] для [Аудитории] — помогает [Действие] [Задачу]`
+
+---
+
+## Структура проекта
+
+```
+app/
+  page.tsx           # Лендинг (9 секций)
+  generator/
+    page.tsx         # Генератор идей (client component)
+  layout.tsx         # Корневой layout (Clerk + шрифты)
+lib/
+  idea-blocks.ts     # Банк смысловых блоков
+  idea-generator.ts  # Функция генерации идеи
+  utils.ts           # cn() и утилиты
 ```
 
-## Stripe Boilerplate
+---
 
-The template now includes a base Stripe Sync setup for syncing Stripe data into Postgres:
+## Assumptions
 
-- Stripe sync utility: `lib/stripe-sync.ts`
-- Stripe setup check endpoint: `app/api/stripe/route.ts`
-- Stripe webhook endpoint: `app/api/stripe/webhook/route.ts`
-- Stripe migration script: `scripts/stripe/migrate.mjs`
-- Stripe backfill script: `scripts/stripe/backfill.mjs`
+1. **Хранение без авторизации** — сохранённые идеи хранятся в `localStorage` браузера. При очистке браузера данные теряются. Для персистентного хранения нужна авторизация (Clerk) + база данных (Neon) — инфраструктура уже есть в шаблоне.
 
-### 1) Install dependencies
+2. **Аналитика** — базовые события (генерация, сохранение) не реализованы. Для добавления: подключи PostHog или Plausible и добавь `track()` в обработчики в `app/generator/page.tsx`.
 
-```bash
-npm install stripe-sync-engine stripe pg @types/pg
-```
+3. **Социальное доказательство** — раздел содержит плейсхолдерные отзывы. После первых 20–30 пользователей заменить на реальные.
 
-### 2) Configure environment variables
+4. **Грамматика фраз** — используется нейтральная конструкция «помогает [действие] [задачу]», которая работает для всех типов продуктов без учёта рода. В будущих версиях можно добавить согласование по роду.
 
-Add these variables to your `.env`:
+5. **Фильтры по направлению** — MVP scope упоминает базовые фильтры по направлению, но в первой версии реализован только фильтр «Избранное». Направления (по нише/аудитории) можно добавить в v1.1.
 
-```bash
-NEON_CONNECTION_STRING=postgresql://<user>:<password>@<host>/<db>?sslmode=require
-DATABASE_URL=postgresql://<user>:<password>@<host>/<db>?sslmode=require
-STRIPE_SECRET_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_API_VERSION=2023-10-16
-```
+---
 
-`DATABASE_URL` is optional in this template if `NEON_CONNECTION_STRING` is already set, but it is useful for Stripe tooling compatibility.
+## Технологический стек
 
-### 3) Verify Stripe setup
-
-Run the app:
-
-```bash
-npm run dev
-```
-
-Open:
-
-- [http://localhost:3000/api/stripe](http://localhost:3000/api/stripe)
-
-If configured correctly, response returns `ok: true` and setup metadata.
-
-### 4) Use Stripe Sync client in server code
-
-```ts
-import { getStripeSyncClient } from "@/lib/stripe-sync";
-
-const stripeSync = getStripeSyncClient();
-```
-
-### 5) Run Stripe schema migrations
-
-```bash
-npm run stripe:migrate
-```
-
-### 6) Configure Stripe webhook endpoint
-
-In Stripe Dashboard create a webhook endpoint pointing to:
-
-- `https://<your-domain>/api/stripe/webhook`
-
-For local development use Stripe CLI:
-
-```bash
-stripe listen --forward-to localhost:3000/api/stripe/webhook
-```
-
-Use the generated signing secret (`whsec_...`) as `STRIPE_WEBHOOK_SECRET` in `.env`.
-
-### 7) Backfill historical Stripe data
-
-```bash
-npm run stripe:backfill
-```
-
-This command syncs existing Stripe objects into the `stripe` schema.
-
-## Lemon Squeezy Boilerplate
-
-The template now includes a base Lemon Squeezy setup:
-
-- Lemon Squeezy utility: `lib/lemonsqueezy.ts`
-- Lemon Squeezy setup check endpoint: `app/api/lemonsqueezy/route.ts`
-- Lemon Squeezy webhook endpoint: `app/api/lemonsqueezy/webhook/route.ts`
-
-### 1) Install dependencies
-
-```bash
-npm install @lemonsqueezy/lemonsqueezy.js
-```
-
-### 2) Configure environment variables
-
-Add these variables to your `.env`:
-
-```bash
-LEMONSQUEEZY_API_KEY=your_api_key
-LEMONSQUEEZY_WEBHOOK_SECRET=your_webhook_secret
-LEMONSQUEEZY_STORE_ID=your_store_id
-```
-
-### 3) Verify Lemon Squeezy setup
-
-Run the app:
-
-```bash
-npm run dev
-```
-
-Open:
-
-- [http://localhost:3000/api/lemonsqueezy](http://localhost:3000/api/lemonsqueezy)
-
-If configured correctly, response returns `ok: true` and authenticated user metadata.
-
-### 4) Configure Lemon Squeezy webhook
-
-Set webhook target URL in Lemon Squeezy dashboard:
-
-- `https://<your-domain>/api/lemonsqueezy/webhook`
-
-For local development, use a tunnel and point the webhook to:
-
-- `https://<your-tunnel-domain>/api/lemonsqueezy/webhook`
-
-## Example CRUD API (notes)
-
-A ready-to-use CRUD route is included:
-
-- `GET /api/notes` — list notes for the current user
-- `POST /api/notes` — create a note
-- `GET /api/notes/:id` — get a note
-- `PATCH /api/notes/:id` — update a note
-- `DELETE /api/notes/:id` — delete a note
-
-Routes:
-
-- `app/api/notes/route.ts`
-- `app/api/notes/[id]/route.ts`
-
-Request examples:
-
-```bash
-curl -X POST http://localhost:3000/api/notes \
-  -H "Content-Type: application/json" \
-  -d '{"title":"First note","content":"Hello Neon"}'
-```
-
-```bash
-curl http://localhost:3000/api/notes
-```
+- **Next.js 16** (App Router, Turbopack)
+- **Tailwind CSS v4**
+- **shadcn/ui** + Base UI компоненты
+- **Lucide React** — иконки
+- **localStorage** — хранение сохранённых идей
+- **Clerk** — авторизация (доступна, не задействована в MVP)
+- **Neon Postgres** — база данных (доступна, не задействована в MVP)
