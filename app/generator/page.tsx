@@ -12,14 +12,17 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { AUDIENCES, SERVICES } from "@/lib/idea-blocks";
+import { AUDIENCES, PAIN_ACTIONS, PROBLEMS, SERVICES } from "@/lib/idea-blocks";
 import {
   type AnalogyIdea,
   type GeneratedIdea,
+  type PainIdea,
   generateAnalogy,
   generateIdea,
+  generatePain,
   type PinnedAnalogyBlocks,
   type PinnedBlocks,
+  type PinnedPainBlocks,
 } from "@/lib/idea-generator";
 import { cn } from "@/lib/utils";
 
@@ -33,7 +36,9 @@ type FrozenKey = "productType" | "audience" | "action" | "problem";
 type FrozenState = Record<FrozenKey, boolean>;
 type AnalogyFrozenKey = "service" | "audience";
 type AnalogyFrozenState = Record<AnalogyFrozenKey, boolean>;
-type TabId = "generator" | "analogy";
+type PainFrozenKey = "painAction" | "problem";
+type PainFrozenState = Record<PainFrozenKey, boolean>;
+type TabId = "generator" | "analogy" | "pains";
 type SwipePhase = "idle" | "dragging" | "exiting";
 
 const STORAGE_KEY = "random-idea:saved";
@@ -62,6 +67,31 @@ const ANALOGY_BLOCKS: {
     badgeNormal:
       "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#00f0ff]/20 transition",
     badgeFrozen: "border-2 border-black bg-[#00f0ff]",
+  },
+];
+
+const PAIN_TAB_BLOCKS: {
+  key: PainFrozenKey;
+  label: string;
+  textBg: string;
+  badgeNormal: string;
+  badgeFrozen: string;
+}[] = [
+  {
+    key: "painAction",
+    label: "ДЕЙСТВИЕ",
+    textBg: "bg-[#ff3d3d]",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#ff3d3d]/20 transition",
+    badgeFrozen: "border-2 border-black bg-[#ff3d3d]",
+  },
+  {
+    key: "problem",
+    label: "ПРОБЛЕМА",
+    textBg: "bg-[#c084fc]",
+    badgeNormal:
+      "border-2 border-black bg-white shadow-[2px_2px_0_0_#000] hover:bg-[#c084fc]/20 transition",
+    badgeFrozen: "border-2 border-black bg-[#c084fc]",
   },
 ];
 
@@ -246,6 +276,14 @@ export default function GeneratorPage() {
   const [sessionCountAnalogy, setSessionCountAnalogy] = useState(0);
   const [isAnimatingAnalogy, setIsAnimatingAnalogy] = useState(false);
 
+  const [currentPain, setCurrentPain] = useState<PainIdea | null>(null);
+  const [frozenPain, setFrozenPain] = useState<PainFrozenState>({
+    painAction: false,
+    problem: false,
+  });
+  const [sessionCountPain, setSessionCountPain] = useState(0);
+  const [isAnimatingPain, setIsAnimatingPain] = useState(false);
+
   const [saved, setSaved] = useState<SavedIdea[]>([]);
   const [showSaved, setShowSaved] = useState(false);
   const [filter, setFilter] = useState<"all" | "favorites">("all");
@@ -253,10 +291,13 @@ export default function GeneratorPage() {
 
   const recentTexts = useRef<string[]>([]);
   const recentAnalogyTexts = useRef<string[]>([]);
+  const recentPainTexts = useRef<string[]>([]);
   const currentRef = useRef<GeneratedIdea | null>(null);
   const frozenRef = useRef<FrozenState>(frozen);
   const currentAnalogyRef = useRef<AnalogyIdea | null>(null);
   const frozenAnalogyRef = useRef<AnalogyFrozenState>(frozenAnalogy);
+  const currentPainRef = useRef<PainIdea | null>(null);
+  const frozenPainRef = useRef<PainFrozenState>(frozenPain);
 
   useEffect(() => {
     currentRef.current = current;
@@ -270,6 +311,12 @@ export default function GeneratorPage() {
   useEffect(() => {
     frozenAnalogyRef.current = frozenAnalogy;
   }, [frozenAnalogy]);
+  useEffect(() => {
+    currentPainRef.current = currentPain;
+  }, [currentPain]);
+  useEffect(() => {
+    frozenPainRef.current = frozenPain;
+  }, [frozenPain]);
 
   useEffect(() => {
     setMounted(true);
@@ -296,6 +343,10 @@ export default function GeneratorPage() {
 
   const toggleFreezeAnalogy = useCallback((key: AnalogyFrozenKey) => {
     setFrozenAnalogy((prev) => ({ ...prev, [key]: !prev[key] }));
+  }, []);
+
+  const toggleFreezePain = useCallback((key: PainFrozenKey) => {
+    setFrozenPain((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
   const doGenerate = useCallback(() => {
@@ -358,6 +409,35 @@ export default function GeneratorPage() {
     });
   }, []);
 
+  const doGeneratePain = useCallback(() => {
+    const cur = currentPainRef.current;
+    const frz = frozenPainRef.current;
+    const pinned: PinnedPainBlocks = {
+      painAction: frz.painAction && cur ? cur.painAction : undefined,
+      problem: frz.problem && cur ? cur.problem : undefined,
+    };
+    const pain = generatePain(recentPainTexts.current, pinned);
+    recentPainTexts.current = [
+      ...recentPainTexts.current.slice(-(RECENT_WINDOW - 1)),
+      pain.text,
+    ];
+    setCurrentPain(pain);
+    setSessionCountPain((c) => c + 1);
+  }, []);
+
+  const doSavePain = useCallback(() => {
+    const cur = currentPainRef.current;
+    if (!cur) {
+      return;
+    }
+    setSaved((prev) => {
+      if (prev.some((s) => s.id === cur.id)) {
+        return prev;
+      }
+      return [{ ...cur, favorite: false }, ...prev];
+    });
+  }, []);
+
   const handleGenerate = useCallback(() => {
     setIsAnimating(true);
     setTimeout(() => {
@@ -382,6 +462,18 @@ export default function GeneratorPage() {
     doSaveAnalogy();
   }, [doSaveAnalogy]);
 
+  const handleGeneratePain = useCallback(() => {
+    setIsAnimatingPain(true);
+    setTimeout(() => {
+      doGeneratePain();
+      setIsAnimatingPain(false);
+    }, 150);
+  }, [doGeneratePain]);
+
+  const handleSavePain = useCallback(() => {
+    doSavePain();
+  }, [doSavePain]);
+
   const toggleFavorite = useCallback((id: string) => {
     setSaved((prev) =>
       prev.map((s) => (s.id === id ? { ...s, favorite: !s.favorite } : s))
@@ -398,6 +490,9 @@ export default function GeneratorPage() {
   const isCurrentAnalogySaved = currentAnalogy
     ? saved.some((s) => s.id === currentAnalogy.id)
     : false;
+  const isCurrentPainSaved = currentPain
+    ? saved.some((s) => s.id === currentPain.id)
+    : false;
   const filteredSaved =
     filter === "favorites" ? saved.filter((s) => s.favorite) : saved;
   const favoritesCount = saved.filter((s) => s.favorite).length;
@@ -406,6 +501,8 @@ export default function GeneratorPage() {
   const frozenAnalogyCount =
     Object.values(frozenAnalogy).filter(Boolean).length;
   const allAnalogyFrozen = frozenAnalogyCount === 2;
+  const frozenPainCount = Object.values(frozenPain).filter(Boolean).length;
+  const allPainFrozen = frozenPainCount === 2;
 
   const swipeGen = useSwipeCard({
     enabled: !!current && !allFrozen && !isAnimating,
@@ -423,6 +520,15 @@ export default function GeneratorPage() {
       doSaveAnalogy();
       doGenerateAnalogy();
     }, [doSaveAnalogy, doGenerateAnalogy]),
+  });
+
+  const swipePain = useSwipeCard({
+    enabled: !!currentPain && !allPainFrozen && !isAnimatingPain,
+    onSwipeLeft: doGeneratePain,
+    onSwipeRight: useCallback(() => {
+      doSavePain();
+      doGeneratePain();
+    }, [doSavePain, doGeneratePain]),
   });
 
   return (
@@ -481,6 +587,18 @@ export default function GeneratorPage() {
               type="button"
             >
               Аналогии
+            </button>
+            <button
+              className={cn(
+                "flex-1 px-4 py-2.5 font-black text-sm uppercase tracking-wide transition",
+                activeTab === "pains"
+                  ? "bg-[#ffe600] text-black"
+                  : "bg-white text-black/50 hover:bg-[#ffe600]/20"
+              )}
+              onClick={() => setActiveTab("pains")}
+              type="button"
+            >
+              Боли
             </button>
           </div>
         </div>
@@ -858,6 +976,184 @@ export default function GeneratorPage() {
                   : sessionCountAnalogy < 5
                     ? "аналогии"
                     : "аналогий"}
+              </p>
+            )}
+          </div>
+        </div>
+
+        <div className={activeTab === "pains" ? "" : "hidden"}>
+          <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
+            <div className="relative">
+              <div
+                {...swipePain.handlers}
+                className={cn(
+                  "relative flex min-h-44 items-center justify-center border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000]",
+                  !currentPain && "transition-all duration-150",
+                  isAnimatingPain && "scale-[0.99] opacity-0"
+                )}
+                style={swipePain.style}
+              >
+                {currentPain ? (
+                  <div className="w-full space-y-5 text-center">
+                    <p className="font-medium text-2xl text-black leading-relaxed sm:text-3xl">
+                      <span className="text-black/50">Что-то </span>
+                      <span
+                        className={cn(
+                          "bg-[#ff3d3d] px-1 font-black",
+                          frozenPain.painAction && "border-2 border-black"
+                        )}
+                      >
+                        {currentPain.painAction}
+                      </span>
+                      <span> </span>
+                      <span
+                        className={cn(
+                          "bg-[#c084fc] px-1 font-black",
+                          frozenPain.problem && "border-2 border-black"
+                        )}
+                      >
+                        {currentPain.problem}
+                      </span>
+                    </p>
+
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {PAIN_TAB_BLOCKS.map((block) => {
+                        const isFrozen = frozenPain[block.key];
+                        return (
+                          <button
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 font-black text-xs uppercase",
+                              isFrozen ? block.badgeFrozen : block.badgeNormal
+                            )}
+                            key={block.key}
+                            onClick={() => toggleFreezePain(block.key)}
+                            title={
+                              isFrozen
+                                ? `Разморозить «${block.label.toLowerCase()}»`
+                                : `Заморозить «${block.label.toLowerCase()}»`
+                            }
+                            type="button"
+                          >
+                            {isFrozen ? (
+                              <Lock className="size-3 shrink-0 text-black" />
+                            ) : (
+                              <LockOpen className="size-3 shrink-0 opacity-30" />
+                            )}
+                            {block.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {frozenPainCount > 0 && (
+                      <p className="font-medium text-black/50 text-xs uppercase tracking-wide">
+                        {allPainFrozen
+                          ? "Оба блока заморожены — разморозь хотя бы один"
+                          : "1 блок заморожен — при генерации он не изменится"}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-center">
+                    <p className="font-medium text-black/60 text-lg">
+                      Нажми кнопку — получи боль
+                    </p>
+                    <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
+                      {PAIN_ACTIONS.length} действий × {PROBLEMS.length}{" "}
+                      проблем ·{" "}
+                      {PAIN_ACTIONS.length * PROBLEMS.length} комбинаций
+                    </p>
+                  </div>
+                )}
+
+                {swipePain.phase === "dragging" && (
+                  <>
+                    <div
+                      className="pointer-events-none absolute top-4 right-4 rotate-12 border-4 border-[#00f0ff] px-3 py-1 font-black text-[#00f0ff] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipePain.direction === "right"
+                            ? swipePain.progress
+                            : 0,
+                      }}
+                    >
+                      Сохранить ★
+                    </div>
+                    <div
+                      className="pointer-events-none absolute top-4 left-4 -rotate-12 border-4 border-[#ff5c8a] px-3 py-1 font-black text-[#ff5c8a] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipePain.direction === "left"
+                            ? swipePain.progress
+                            : 0,
+                      }}
+                    >
+                      Пропустить ✕
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+
+            {currentPain && !allPainFrozen && (
+              <p className="text-center font-bold text-black/30 text-xs uppercase tracking-wide">
+                ← пропустить · сохранить →
+              </p>
+            )}
+
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <button
+                className={cn(
+                  "inline-flex h-12 flex-1 items-center justify-center gap-2 border-2 border-black font-black text-base uppercase transition",
+                  allPainFrozen
+                    ? "cursor-not-allowed border-black/30 bg-black/10 text-black/30"
+                    : "bg-[#ffe600] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                )}
+                disabled={allPainFrozen}
+                onClick={handleGeneratePain}
+                type="button"
+              >
+                <Shuffle className="size-4" />
+                {sessionCountPain === 0
+                  ? "Сгенерировать боль"
+                  : "Новая боль"}
+              </button>
+              {currentPain && (
+                <button
+                  className={cn(
+                    "inline-flex h-12 items-center justify-center gap-2 border-2 border-black px-5 font-black text-base uppercase transition",
+                    isCurrentPainSaved
+                      ? "cursor-default bg-[#ff5c8a] text-black"
+                      : "bg-[#00f0ff] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
+                  )}
+                  disabled={isCurrentPainSaved}
+                  onClick={handleSavePain}
+                  type="button"
+                >
+                  {isCurrentPainSaved ? (
+                    <>
+                      <BookmarkCheck className="size-4" />
+                      Сохранено
+                    </>
+                  ) : (
+                    <>
+                      <Bookmark className="size-4" />
+                      Сохранить
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+
+            {sessionCountPain > 0 && (
+              <p className="text-center font-bold text-black/40 text-sm uppercase tracking-wide">
+                За сессию:{" "}
+                <span className="text-black">{sessionCountPain}</span>{" "}
+                {sessionCountPain === 1
+                  ? "боль"
+                  : sessionCountPain < 5
+                    ? "боли"
+                    : "болей"}
               </p>
             )}
           </div>

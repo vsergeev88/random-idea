@@ -1,4 +1,4 @@
-import { PRODUCT_TYPES, AUDIENCES, ACTIONS, PROBLEMS, SERVICES } from "./idea-blocks"
+import { PRODUCT_TYPES, AUDIENCES, ACTIONS, PROBLEMS, SERVICES, PAIN_ACTIONS } from "./idea-blocks"
 
 export interface GeneratedIdea {
   id: string
@@ -63,6 +63,44 @@ export interface AnalogyIdea {
 export interface PinnedAnalogyBlocks {
   service?: string
   audience?: string
+}
+
+export interface PainIdea {
+  id: string
+  text: string
+  painAction: string
+  problem: string
+  generatedAt: number
+}
+
+export interface PinnedPainBlocks {
+  painAction?: string
+  problem?: string
+}
+
+export function generatePain(
+  recentTexts: string[] = [],
+  pinned: PinnedPainBlocks = {}
+): PainIdea {
+  let painAction: string
+  let problem: string
+  let text: string
+  let attempts = 0
+
+  do {
+    painAction = pinned.painAction ?? randomFrom(PAIN_ACTIONS)
+    problem = pinned.problem ?? randomFrom(PROBLEMS)
+    text = `Что-то ${painAction} ${problem}`
+    attempts++
+  } while (recentTexts.includes(text) && attempts < 20)
+
+  return {
+    id: `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`,
+    text,
+    painAction,
+    problem,
+    generatedAt: Date.now(),
+  }
 }
 
 export function generateAnalogy(
