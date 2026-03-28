@@ -18,6 +18,7 @@ import {
   type GeneratedIdea,
   generateAnalogy,
   generateIdea,
+  type PinnedAnalogyBlocks,
   type PinnedBlocks,
 } from "@/lib/idea-generator";
 import { cn } from "@/lib/utils";
@@ -33,6 +34,11 @@ type FrozenState = Record<FrozenKey, boolean>;
 type AnalogyFrozenKey = "service" | "audience";
 type AnalogyFrozenState = Record<AnalogyFrozenKey, boolean>;
 type TabId = "generator" | "analogy";
+type SwipePhase = "idle" | "dragging" | "exiting";
+
+const STORAGE_KEY = "random-idea:saved";
+const RECENT_WINDOW = 5;
+const SWIPE_THRESHOLD = 100;
 
 const ANALOGY_BLOCKS: {
   key: AnalogyFrozenKey;
@@ -58,9 +64,6 @@ const ANALOGY_BLOCKS: {
     badgeFrozen: "border-2 border-black bg-[#00f0ff]",
   },
 ];
-
-const STORAGE_KEY = "random-idea:saved";
-const RECENT_WINDOW = 5;
 
 const BLOCKS: {
   key: FrozenKey;
@@ -113,6 +116,113 @@ const BLOCKS: {
   },
 ];
 
+function useSwipeCard({
+  enabled,
+  onSwipeLeft,
+  onSwipeRight,
+}: {
+  enabled: boolean;
+  onSwipeLeft: () => void;
+  onSwipeRight: () => void;
+}) {
+  const [swipeX, setSwipeX] = useState(0);
+  const [phase, setPhase] = useState<SwipePhase>("idle");
+  const [exitDir, setExitDir] = useState<"left" | "right" | null>(null);
+  const startX = useRef(0);
+  const leftRef = useRef(onSwipeLeft);
+  const rightRef = useRef(onSwipeRight);
+
+  useEffect(() => {
+    leftRef.current = onSwipeLeft;
+  }, [onSwipeLeft]);
+  useEffect(() => {
+    rightRef.current = onSwipeRight;
+  }, [onSwipeRight]);
+
+  const onPointerDown = useCallback(
+    (e: React.PointerEvent) => {
+      if (!enabled || phase !== "idle") {
+        return;
+      }
+      if ((e.target as HTMLElement).closest("button")) {
+        return;
+      }
+      startX.current = e.clientX;
+      setPhase("dragging");
+      setSwipeX(0);
+      (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+    },
+    [enabled, phase]
+  );
+
+  const onPointerMove = useCallback(
+    (e: React.PointerEvent) => {
+      if (phase !== "dragging") {
+        return;
+      }
+      setSwipeX(e.clientX - startX.current);
+    },
+    [phase]
+  );
+
+  const onPointerUp = useCallback(() => {
+    if (phase !== "dragging") {
+      return;
+    }
+
+    if (Math.abs(swipeX) > SWIPE_THRESHOLD) {
+      const dir = swipeX > 0 ? ("right" as const) : ("left" as const);
+      setExitDir(dir);
+      setPhase("exiting");
+
+      setTimeout(() => {
+        if (dir === "right") {
+          rightRef.current();
+        } else {
+          leftRef.current();
+        }
+        setPhase("idle");
+        setSwipeX(0);
+        setExitDir(null);
+      }, 300);
+    } else {
+      setPhase("idle");
+      setSwipeX(0);
+    }
+  }, [phase, swipeX]);
+
+  const progress = Math.min(1, Math.abs(swipeX) / SWIPE_THRESHOLD);
+  const direction = swipeX > 0 ? "right" : swipeX < 0 ? "left" : null;
+
+  const style: React.CSSProperties = {
+    transform:
+      phase === "exiting"
+        ? `translateX(${exitDir === "right" ? 500 : -500}px) rotate(${exitDir === "right" ? 15 : -15}deg)`
+        : phase === "dragging"
+          ? `translateX(${swipeX}px) rotate(${swipeX * 0.04}deg)`
+          : undefined,
+    transition:
+      phase === "exiting"
+        ? "transform 300ms ease-out, opacity 300ms ease-out"
+        : phase === "idle"
+          ? "transform 200ms ease-out"
+          : "none",
+    opacity: phase === "exiting" ? 0 : 1,
+    cursor: enabled ? (phase === "dragging" ? "grabbing" : "grab") : undefined,
+    userSelect: "none" as const,
+    touchAction: "pan-y" as const,
+  };
+
+  return {
+    handlers: { onPointerDown, onPointerMove, onPointerUp },
+    style,
+    phase,
+    swipeX,
+    progress,
+    direction,
+  };
+}
+
 export default function GeneratorPage() {
   const [activeTab, setActiveTab] = useState<TabId>("generator");
 
@@ -151,15 +261,12 @@ export default function GeneratorPage() {
   useEffect(() => {
     currentRef.current = current;
   }, [current]);
-
   useEffect(() => {
     frozenRef.current = frozen;
   }, [frozen]);
-
   useEffect(() => {
     currentAnalogyRef.current = currentAnalogy;
   }, [currentAnalogy]);
-
   useEffect(() => {
     frozenAnalogyRef.current = frozenAnalogy;
   }, [frozenAnalogy]);
@@ -191,71 +298,89 @@ export default function GeneratorPage() {
     setFrozenAnalogy((prev) => ({ ...prev, [key]: !prev[key] }));
   }, []);
 
-  const handleGenerate = useCallback(() => {
-    setIsAnimating(true);
-    setTimeout(() => {
-      const cur = currentRef.current;
-      const frz = frozenRef.current;
-      const pinned: PinnedBlocks = {
-        productType: frz.productType && cur ? cur.productType : undefined,
-        audience: frz.audience && cur ? cur.audience : undefined,
-        action: frz.action && cur ? cur.action : undefined,
-        problem: frz.problem && cur ? cur.problem : undefined,
-      };
-      const idea = generateIdea(recentTexts.current, pinned);
-      recentTexts.current = [
-        ...recentTexts.current.slice(-(RECENT_WINDOW - 1)),
-        idea.text,
-      ];
-      setCurrent(idea);
-      setSessionCount((c) => c + 1);
-      setIsAnimating(false);
-    }, 150);
+  const doGenerate = useCallback(() => {
+    const cur = currentRef.current;
+    const frz = frozenRef.current;
+    const pinned: PinnedBlocks = {
+      productType: frz.productType && cur ? cur.productType : undefined,
+      audience: frz.audience && cur ? cur.audience : undefined,
+      action: frz.action && cur ? cur.action : undefined,
+      problem: frz.problem && cur ? cur.problem : undefined,
+    };
+    const idea = generateIdea(recentTexts.current, pinned);
+    recentTexts.current = [
+      ...recentTexts.current.slice(-(RECENT_WINDOW - 1)),
+      idea.text,
+    ];
+    setCurrent(idea);
+    setSessionCount((c) => c + 1);
   }, []);
 
-  const handleSave = useCallback(() => {
-    if (!current) {
+  const doSave = useCallback(() => {
+    const cur = currentRef.current;
+    if (!cur) {
       return;
     }
     setSaved((prev) => {
-      if (prev.some((s) => s.id === current.id)) {
+      if (prev.some((s) => s.id === cur.id)) {
         return prev;
       }
-      return [{ ...current, favorite: false }, ...prev];
+      return [{ ...cur, favorite: false }, ...prev];
     });
-  }, [current]);
+  }, []);
+
+  const doGenerateAnalogy = useCallback(() => {
+    const cur = currentAnalogyRef.current;
+    const frz = frozenAnalogyRef.current;
+    const pinned: PinnedAnalogyBlocks = {
+      service: frz.service && cur ? cur.service : undefined,
+      audience: frz.audience && cur ? cur.audience : undefined,
+    };
+    const analogy = generateAnalogy(recentAnalogyTexts.current, pinned);
+    recentAnalogyTexts.current = [
+      ...recentAnalogyTexts.current.slice(-(RECENT_WINDOW - 1)),
+      analogy.text,
+    ];
+    setCurrentAnalogy(analogy);
+    setSessionCountAnalogy((c) => c + 1);
+  }, []);
+
+  const doSaveAnalogy = useCallback(() => {
+    const cur = currentAnalogyRef.current;
+    if (!cur) {
+      return;
+    }
+    setSaved((prev) => {
+      if (prev.some((s) => s.id === cur.id)) {
+        return prev;
+      }
+      return [{ ...cur, favorite: false }, ...prev];
+    });
+  }, []);
+
+  const handleGenerate = useCallback(() => {
+    setIsAnimating(true);
+    setTimeout(() => {
+      doGenerate();
+      setIsAnimating(false);
+    }, 150);
+  }, [doGenerate]);
+
+  const handleSave = useCallback(() => {
+    doSave();
+  }, [doSave]);
 
   const handleGenerateAnalogy = useCallback(() => {
     setIsAnimatingAnalogy(true);
     setTimeout(() => {
-      const cur = currentAnalogyRef.current;
-      const frz = frozenAnalogyRef.current;
-      const pinned: PinnedAnalogyBlocks = {
-        service: frz.service && cur ? cur.service : undefined,
-        audience: frz.audience && cur ? cur.audience : undefined,
-      };
-      const analogy = generateAnalogy(recentAnalogyTexts.current, pinned);
-      recentAnalogyTexts.current = [
-        ...recentAnalogyTexts.current.slice(-(RECENT_WINDOW - 1)),
-        analogy.text,
-      ];
-      setCurrentAnalogy(analogy);
-      setSessionCountAnalogy((c) => c + 1);
+      doGenerateAnalogy();
       setIsAnimatingAnalogy(false);
     }, 150);
-  }, []);
+  }, [doGenerateAnalogy]);
 
   const handleSaveAnalogy = useCallback(() => {
-    if (!currentAnalogy) {
-      return;
-    }
-    setSaved((prev) => {
-      if (prev.some((s) => s.id === currentAnalogy.id)) {
-        return prev;
-      }
-      return [{ ...currentAnalogy, favorite: false }, ...prev];
-    });
-  }, [currentAnalogy]);
+    doSaveAnalogy();
+  }, [doSaveAnalogy]);
 
   const toggleFavorite = useCallback((id: string) => {
     setSaved((prev) =>
@@ -281,6 +406,24 @@ export default function GeneratorPage() {
   const frozenAnalogyCount =
     Object.values(frozenAnalogy).filter(Boolean).length;
   const allAnalogyFrozen = frozenAnalogyCount === 2;
+
+  const swipeGen = useSwipeCard({
+    enabled: !!current && !allFrozen && !isAnimating,
+    onSwipeLeft: doGenerate,
+    onSwipeRight: useCallback(() => {
+      doSave();
+      doGenerate();
+    }, [doSave, doGenerate]),
+  });
+
+  const swipeAnalogy = useSwipeCard({
+    enabled: !!currentAnalogy && !allAnalogyFrozen && !isAnimatingAnalogy,
+    onSwipeLeft: doGenerateAnalogy,
+    onSwipeRight: useCallback(() => {
+      doSaveAnalogy();
+      doGenerateAnalogy();
+    }, [doSaveAnalogy, doGenerateAnalogy]),
+  });
 
   return (
     <div className="flex min-h-screen flex-col bg-[#fff8d6]">
@@ -325,7 +468,7 @@ export default function GeneratorPage() {
               onClick={() => setActiveTab("generator")}
               type="button"
             >
-              Генератор идей
+              Идеи
             </button>
             <button
               className={cn(
@@ -344,106 +487,148 @@ export default function GeneratorPage() {
 
         <div className={activeTab === "generator" ? "" : "hidden"}>
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
-            <div
-              className={cn(
-                "flex min-h-44 items-center justify-center border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000] transition-all duration-150",
-                isAnimating ? "scale-[0.99] opacity-0" : "scale-100 opacity-100"
-              )}
-            >
-              {current ? (
-                <div className="w-full space-y-5 text-center">
-                  <p className="font-medium text-black text-xl leading-relaxed sm:text-2xl">
-                    {BLOCKS.map((block, i) => {
-                      const value = current[block.key];
-                      const isFrozen = frozen[block.key];
-                      const isProblem = block.key === "problem";
+            <div className="relative">
+              <div
+                {...swipeGen.handlers}
+                className={cn(
+                  "relative flex min-h-44 items-center justify-center border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000]",
+                  !current && "transition-all duration-150",
+                  isAnimating && "scale-[0.99] opacity-0"
+                )}
+                style={swipeGen.style}
+              >
+                {current ? (
+                  <div className="w-full space-y-5 text-center">
+                    <p className="font-medium text-black text-xl leading-relaxed sm:text-2xl">
+                      {BLOCKS.map((block, i) => {
+                        const value = current[block.key];
+                        const isFrozen = frozen[block.key];
+                        const isProblem = block.key === "problem";
 
-                      return (
-                        <span key={block.key}>
-                          {i === 1 && (
-                            <span className="text-black/50"> для </span>
-                          )}
-                          {i === 2 && (
-                            <span className="text-black/50"> — помогает </span>
-                          )}
-                          {i === 3 && <span> </span>}
-                          {isProblem ? (
-                            <span
-                              className={cn(
-                                "font-black text-black",
-                                isFrozen
-                                  ? "bg-black px-1 text-white"
-                                  : "underline decoration-2 decoration-black"
-                              )}
-                            >
-                              {value}
-                            </span>
-                          ) : (
-                            <span
-                              className={cn(
-                                "px-1 font-black text-black",
-                                block.textBg,
-                                isFrozen && "border-2 border-black"
-                              )}
-                            >
-                              {value}
-                            </span>
-                          )}
-                        </span>
-                      );
-                    })}
-                  </p>
-
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {BLOCKS.map((block) => {
-                      const isFrozen = frozen[block.key];
-                      return (
-                        <button
-                          className={cn(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 font-black text-xs uppercase",
-                            isFrozen ? block.badgeFrozen : block.badgeNormal
-                          )}
-                          key={block.key}
-                          onClick={() => toggleFreeze(block.key)}
-                          title={
-                            isFrozen
-                              ? `Разморозить «${block.label.toLowerCase()}»`
-                              : `Заморозить «${block.label.toLowerCase()}»`
-                          }
-                          type="button"
-                        >
-                          {isFrozen ? (
-                            <Lock
-                              className={cn("size-3 shrink-0", block.lockColor)}
-                            />
-                          ) : (
-                            <LockOpen className="size-3 shrink-0 opacity-30" />
-                          )}
-                          {block.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {frozenCount > 0 && (
-                    <p className="font-medium text-black/50 text-xs uppercase tracking-wide">
-                      {allFrozen
-                        ? "Все блоки заморожены — разморозь хотя бы один"
-                        : `${frozenCount} ${frozenCount === 1 ? "блок заморожен" : "блока заморожено"} — при генерации ${frozenCount === 1 ? "он" : "они"} не изменятся`}
+                        return (
+                          <span key={block.key}>
+                            {i === 1 && (
+                              <span className="text-black/50"> для </span>
+                            )}
+                            {i === 2 && (
+                              <span className="text-black/50">
+                                {" "}
+                                — помогает{" "}
+                              </span>
+                            )}
+                            {i === 3 && <span> </span>}
+                            {isProblem ? (
+                              <span
+                                className={cn(
+                                  "font-black text-black",
+                                  isFrozen
+                                    ? "bg-black px-1 text-white"
+                                    : "underline decoration-2 decoration-black"
+                                )}
+                              >
+                                {value}
+                              </span>
+                            ) : (
+                              <span
+                                className={cn(
+                                  "px-1 font-black text-black",
+                                  block.textBg,
+                                  isFrozen && "border-2 border-black"
+                                )}
+                              >
+                                {value}
+                              </span>
+                            )}
+                          </span>
+                        );
+                      })}
                     </p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3 text-center">
-                  <p className="font-medium text-black/60 text-lg">
-                    Нажми кнопку, чтобы получить первую идею
-                  </p>
-                  <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
-                    4 блока · 120 000+ комбинаций · заморозка блоков
-                  </p>
-                </div>
-              )}
+
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {BLOCKS.map((block) => {
+                        const isFrozen = frozen[block.key];
+                        return (
+                          <button
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 font-black text-xs uppercase",
+                              isFrozen ? block.badgeFrozen : block.badgeNormal
+                            )}
+                            key={block.key}
+                            onClick={() => toggleFreeze(block.key)}
+                            title={
+                              isFrozen
+                                ? `Разморозить «${block.label.toLowerCase()}»`
+                                : `Заморозить «${block.label.toLowerCase()}»`
+                            }
+                            type="button"
+                          >
+                            {isFrozen ? (
+                              <Lock
+                                className={cn(
+                                  "size-3 shrink-0",
+                                  block.lockColor
+                                )}
+                              />
+                            ) : (
+                              <LockOpen className="size-3 shrink-0 opacity-30" />
+                            )}
+                            {block.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {frozenCount > 0 && (
+                      <p className="font-medium text-black/50 text-xs uppercase tracking-wide">
+                        {allFrozen
+                          ? "Все блоки заморожены — разморозь хотя бы один"
+                          : `${frozenCount} ${frozenCount === 1 ? "блок заморожен" : "блока заморожено"} — при генерации ${frozenCount === 1 ? "он" : "они"} не изменятся`}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-center">
+                    <p className="font-medium text-black/60 text-lg">
+                      Нажми кнопку, чтобы получить первую идею
+                    </p>
+                    <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
+                      4 блока · 120 000+ комбинаций · заморозка блоков
+                    </p>
+                  </div>
+                )}
+
+                {swipeGen.phase === "dragging" && (
+                  <>
+                    <div
+                      className="pointer-events-none absolute top-4 right-4 rotate-12 border-4 border-[#00f0ff] px-3 py-1 font-black text-[#00f0ff] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipeGen.direction === "right"
+                            ? swipeGen.progress
+                            : 0,
+                      }}
+                    >
+                      Сохранить ★
+                    </div>
+                    <div
+                      className="pointer-events-none absolute top-4 left-4 -rotate-12 border-4 border-[#ff5c8a] px-3 py-1 font-black text-[#ff5c8a] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipeGen.direction === "left" ? swipeGen.progress : 0,
+                      }}
+                    >
+                      Пропустить ✕
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
+
+            {current && !allFrozen && (
+              <p className="text-center font-bold text-black/30 text-xs uppercase tracking-wide">
+                ← пропустить · сохранить →
+              </p>
+            )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
@@ -504,90 +689,126 @@ export default function GeneratorPage() {
 
         <div className={activeTab === "analogy" ? "" : "hidden"}>
           <div className="mx-auto flex w-full max-w-2xl flex-col gap-6 px-4 py-10">
-            <div
-              className={cn(
-                "flex min-h-44 items-center justify-center border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000] transition-all duration-150",
-                isAnimatingAnalogy
-                  ? "scale-[0.99] opacity-0"
-                  : "scale-100 opacity-100"
-              )}
-            >
-              {currentAnalogy ? (
-                <div className="w-full space-y-5 text-center">
-                  <p className="font-medium text-2xl text-black leading-relaxed sm:text-3xl">
-                    <span
-                      className={cn(
-                        "bg-[#ff5c8a] px-1 font-black",
-                        frozenAnalogy.service && "border-2 border-black"
-                      )}
-                    >
-                      {currentAnalogy.service}
-                    </span>
-                    <span className="text-black/50"> для </span>
-                    <span
-                      className={cn(
-                        "bg-[#00f0ff] px-1 font-black",
-                        frozenAnalogy.audience && "border-2 border-black"
-                      )}
-                    >
-                      {currentAnalogy.audience}
-                    </span>
-                  </p>
-
-                  <div className="flex flex-wrap justify-center gap-2">
-                    {ANALOGY_BLOCKS.map((block) => {
-                      const isFrozen = frozenAnalogy[block.key];
-                      return (
-                        <button
-                          className={cn(
-                            "inline-flex items-center gap-1.5 px-3 py-1.5 font-black text-xs uppercase",
-                            isFrozen ? block.badgeFrozen : block.badgeNormal
-                          )}
-                          key={block.key}
-                          onClick={() => toggleFreezeAnalogy(block.key)}
-                          title={
-                            isFrozen
-                              ? `Разморозить «${block.label.toLowerCase()}»`
-                              : `Заморозить «${block.label.toLowerCase()}»`
-                          }
-                          type="button"
-                        >
-                          {isFrozen ? (
-                            <Lock className="size-3 shrink-0 text-black" />
-                          ) : (
-                            <LockOpen className="size-3 shrink-0 opacity-30" />
-                          )}
-                          {block.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  {frozenAnalogyCount > 0 && (
-                    <p className="font-medium text-black/50 text-xs uppercase tracking-wide">
-                      {allAnalogyFrozen
-                        ? "Оба блока заморожены — разморозь хотя бы один"
-                        : "1 блок заморожен — при генерации он не изменится"}
+            <div className="relative">
+              <div
+                {...swipeAnalogy.handlers}
+                className={cn(
+                  "relative flex min-h-44 items-center justify-center border-2 border-black bg-white p-8 shadow-[5px_5px_0_0_#000]",
+                  !currentAnalogy && "transition-all duration-150",
+                  isAnimatingAnalogy && "scale-[0.99] opacity-0"
+                )}
+                style={swipeAnalogy.style}
+              >
+                {currentAnalogy ? (
+                  <div className="w-full space-y-5 text-center">
+                    <p className="font-medium text-2xl text-black leading-relaxed sm:text-3xl">
+                      <span
+                        className={cn(
+                          "bg-[#ff5c8a] px-1 font-black",
+                          frozenAnalogy.service && "border-2 border-black"
+                        )}
+                      >
+                        {currentAnalogy.service}
+                      </span>
+                      <span className="text-black/50"> для </span>
+                      <span
+                        className={cn(
+                          "bg-[#00f0ff] px-1 font-black",
+                          frozenAnalogy.audience && "border-2 border-black"
+                        )}
+                      >
+                        {currentAnalogy.audience}
+                      </span>
                     </p>
-                  )}
-                </div>
-              ) : (
-                <div className="space-y-3 text-center">
-                  <p className="font-medium text-black/60 text-lg">
-                    Нажми кнопку — получи аналогию
-                  </p>
-                  <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
-                    {SERVICES.length} сервисов × {AUDIENCES.length} аудиторий ·{" "}
-                    {SERVICES.length * AUDIENCES.length} комбинаций
-                  </p>
-                </div>
-              )}
+
+                    <div className="flex flex-wrap justify-center gap-2">
+                      {ANALOGY_BLOCKS.map((block) => {
+                        const isFrozen = frozenAnalogy[block.key];
+                        return (
+                          <button
+                            className={cn(
+                              "inline-flex items-center gap-1.5 px-3 py-1.5 font-black text-xs uppercase",
+                              isFrozen ? block.badgeFrozen : block.badgeNormal
+                            )}
+                            key={block.key}
+                            onClick={() => toggleFreezeAnalogy(block.key)}
+                            title={
+                              isFrozen
+                                ? `Разморозить «${block.label.toLowerCase()}»`
+                                : `Заморозить «${block.label.toLowerCase()}»`
+                            }
+                            type="button"
+                          >
+                            {isFrozen ? (
+                              <Lock className="size-3 shrink-0 text-black" />
+                            ) : (
+                              <LockOpen className="size-3 shrink-0 opacity-30" />
+                            )}
+                            {block.label}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {frozenAnalogyCount > 0 && (
+                      <p className="font-medium text-black/50 text-xs uppercase tracking-wide">
+                        {allAnalogyFrozen
+                          ? "Оба блока заморожены — разморозь хотя бы один"
+                          : "1 блок заморожен — при генерации он не изменится"}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3 text-center">
+                    <p className="font-medium text-black/60 text-lg">
+                      Нажми кнопку — получи аналогию
+                    </p>
+                    <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
+                      {SERVICES.length} сервисов × {AUDIENCES.length} аудиторий
+                      · {SERVICES.length * AUDIENCES.length} комбинаций
+                    </p>
+                  </div>
+                )}
+
+                {swipeAnalogy.phase === "dragging" && (
+                  <>
+                    <div
+                      className="pointer-events-none absolute top-4 right-4 rotate-12 border-4 border-[#00f0ff] px-3 py-1 font-black text-[#00f0ff] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipeAnalogy.direction === "right"
+                            ? swipeAnalogy.progress
+                            : 0,
+                      }}
+                    >
+                      Сохранить ★
+                    </div>
+                    <div
+                      className="pointer-events-none absolute top-4 left-4 -rotate-12 border-4 border-[#ff5c8a] px-3 py-1 font-black text-[#ff5c8a] text-lg uppercase"
+                      style={{
+                        opacity:
+                          swipeAnalogy.direction === "left"
+                            ? swipeAnalogy.progress
+                            : 0,
+                      }}
+                    >
+                      Пропустить ✕
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
+
+            {currentAnalogy && !allAnalogyFrozen && (
+              <p className="text-center font-bold text-black/30 text-xs uppercase tracking-wide">
+                ← пропустить · сохранить →
+              </p>
+            )}
 
             <div className="flex flex-col gap-3 sm:flex-row">
               <button
                 className={cn(
-                  "inline-flex min-h-12 flex-1 items-center justify-center gap-2 border-2 border-black font-black text-base uppercase transition",
+                  "inline-flex h-12 flex-1 items-center justify-center gap-2 border-2 border-black font-black text-base uppercase transition",
                   allAnalogyFrozen
                     ? "cursor-not-allowed border-black/30 bg-black/10 text-black/30"
                     : "bg-[#ffe600] text-black shadow-[4px_4px_0_0_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none"
