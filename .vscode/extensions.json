@@ -3,7 +3,6 @@
     "biomejs.biome",
     "bradlc.vscode-tailwindcss",
     "streetsidesoftware.code-spell-checker",
-    "eamodio.gitlens",
-    "databricks.neon-local-connect"
+    "eamodio.gitlens"
   ]
 }

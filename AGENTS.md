@@ -6,30 +6,15 @@
 ## Project-Specific Context
 
 - Framework: Next.js App Router with TypeScript
-- Auth: Clerk
-- Database: Neon Postgres (`lib/neon.ts`)
-- Stripe sync: `stripe-sync-engine` via `lib/stripe-sync.ts`
-- Stripe validation route: `GET /api/stripe`
-- Stripe webhook route: `POST /api/stripe/webhook`
-- Stripe migration script: `npm run stripe:migrate`
-- Stripe backfill script: `npm run stripe:backfill`
-- Lemon Squeezy utility: `lib/lemonsqueezy.ts`
+- Lemon Squeezy utility: `lib/payment/lemonsqueezy.ts`
 - Lemon Squeezy health route: `GET /api/lemonsqueezy`
 - Lemon Squeezy webhook route: `POST /api/lemonsqueezy/webhook`
-- Notes CRUD routes: `app/api/notes/route.ts` and `app/api/notes/[id]/route.ts`
 
 ## Environment Variables Used In Code
 
-- `NEON_CONNECTION_STRING`
-- `DATABASE_URL`
-- `STRIPE_SECRET_KEY`
-- `STRIPE_WEBHOOK_SECRET`
-- `STRIPE_API_VERSION`
 - `LEMONSQUEEZY_API_KEY`
 - `LEMONSQUEEZY_WEBHOOK_SECRET`
 - `LEMONSQUEEZY_STORE_ID`
-- `CLERK_SECRET_KEY`
-- `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`
 
 This project uses **Ultracite**, a zero-config preset that enforces strict code quality standards through automated formatting and linting.
 

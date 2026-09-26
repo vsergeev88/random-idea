@@ -1,5 +1,8 @@
 import crypto from "node:crypto";
-import { getAuthenticatedUser, lemonSqueezySetup } from "@lemonsqueezy/lemonsqueezy.js";
+import {
+  getAuthenticatedUser,
+  lemonSqueezySetup,
+} from "@lemonsqueezy/lemonsqueezy.js";
 
 function getLemonSqueezyApiKey() {
   return process.env.LEMONSQUEEZY_API_KEY ?? null;
@@ -33,13 +36,18 @@ export async function getLemonSqueezyAuthHealth() {
   const response = await getAuthenticatedUser();
 
   if (response.error || !response.data) {
-    throw new Error(response.error?.message ?? "Failed to authenticate Lemon Squeezy client");
+    throw new Error(
+      response.error?.message ?? "Failed to authenticate Lemon Squeezy client"
+    );
   }
 
   return response.data;
 }
 
-export function verifyLemonSqueezyWebhookSignature(payload: string, signature: string | null) {
+export function verifyLemonSqueezyWebhookSignature(
+  payload: string,
+  signature: string | null
+) {
   const secret = getLemonSqueezyWebhookSecret();
 
   if (!secret) {
@@ -50,7 +58,10 @@ export function verifyLemonSqueezyWebhookSignature(payload: string, signature: s
     return false;
   }
 
-  const digest = crypto.createHmac("sha256", secret).update(payload).digest("hex");
+  const digest = crypto
+    .createHmac("sha256", secret)
+    .update(payload)
+    .digest("hex");
   const digestBuffer = Buffer.from(digest, "utf8");
   const signatureBuffer = Buffer.from(signature, "utf8");
 

@@ -1,12 +1,12 @@
-"use client"
+"use client";
 
-import type { ComponentProps, HTMLAttributes } from "react"
-import { Badge } from "@/components/ui/badge"
-import { cn } from "@/lib/utils"
+import type { ComponentProps, HTMLAttributes } from "react";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 export type StatusProps = ComponentProps<typeof Badge> & {
-  status: "online" | "offline" | "maintenance" | "degraded"
-}
+  status: "online" | "offline" | "maintenance" | "degraded";
+};
 
 export const Status = ({ className, status, ...props }: StatusProps) => (
   <Badge
@@ -14,11 +14,14 @@ export const Status = ({ className, status, ...props }: StatusProps) => (
     variant="secondary"
     {...(props as any)}
   />
-)
+);
 
-export type StatusIndicatorProps = HTMLAttributes<HTMLSpanElement>
+export type StatusIndicatorProps = HTMLAttributes<HTMLSpanElement>;
 
-export const StatusIndicator = ({ className, ...props }: StatusIndicatorProps) => (
+export const StatusIndicator = ({
+  className,
+  ...props
+}: StatusIndicatorProps) => (
   <span className={cn("relative flex h-2 w-2", className)} {...(props as any)}>
     <span
       className={cn(
@@ -26,7 +29,7 @@ export const StatusIndicator = ({ className, ...props }: StatusIndicatorProps) =
         "group-[.online]:bg-emerald-500",
         "group-[.offline]:bg-red-500",
         "group-[.maintenance]:bg-blue-500",
-        "group-[.degraded]:bg-amber-500",
+        "group-[.degraded]:bg-amber-500"
       )}
     />
     <span
@@ -35,15 +38,19 @@ export const StatusIndicator = ({ className, ...props }: StatusIndicatorProps) =
         "group-[.online]:bg-emerald-500",
         "group-[.offline]:bg-red-500",
         "group-[.maintenance]:bg-blue-500",
-        "group-[.degraded]:bg-amber-500",
+        "group-[.degraded]:bg-amber-500"
       )}
     />
   </span>
-)
+);
 
-export type StatusLabelProps = HTMLAttributes<HTMLSpanElement>
+export type StatusLabelProps = HTMLAttributes<HTMLSpanElement>;
 
-export const StatusLabel = ({ className, children, ...props }: StatusLabelProps) => (
+export const StatusLabel = ({
+  className,
+  children,
+  ...props
+}: StatusLabelProps) => (
   <span className={cn("text-muted-foreground", className)} {...(props as any)}>
     {children ?? (
       <>
@@ -54,7 +61,7 @@ export const StatusLabel = ({ className, children, ...props }: StatusLabelProps)
       </>
     )}
   </span>
-)
+);
 
 // Demo
 export function Demo() {
@@ -77,5 +84,5 @@ export function Demo() {
         <StatusLabel />
       </Status>
     </div>
-  )
+  );
 }

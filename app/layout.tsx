@@ -1,16 +1,17 @@
-import { ClerkProvider } from "@clerk/nextjs";
-import { ui } from "@clerk/ui";
-import "./globals.css";
+import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import localFont from "next/font/local";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { templateMetadata } from "./_template/content/metadata";
-import { clerkAppearanceObject } from "./clerkAppearanceObject";
+import "./globals.css";
 
 const raleway = Raleway({ subsets: ["latin"], variable: "--font-sans" });
 
-export const metadata = templateMetadata;
+export const metadata: Metadata = {
+  title: "random-idea — генератор идей для стартапа",
+  description:
+    "Придумай идею стартапа за 5 минут из продуманных смысловых блоков. Бесплатно, без регистрации.",
+};
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -37,11 +38,9 @@ export default function RootLayout({
       )}
       lang="en"
     >
-      <ClerkProvider appearance={clerkAppearanceObject} ui={ui}>
-        <body className={"flex min-h-screen flex-col antialiased"}>
-          <TooltipProvider>{children}</TooltipProvider>
-        </body>
-      </ClerkProvider>
+      <body className={"flex min-h-screen flex-col antialiased"}>
+        <TooltipProvider>{children}</TooltipProvider>
+      </body>
     </html>
   );
 }

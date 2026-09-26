@@ -2,25 +2,19 @@
   "workbench.colorCustomizations": {
     "activityBar.background": "#241B7F",
     "titleBar.activeBackground": "#3225B2",
-    "titleBar.activeForeground": "#FAF9FE",
+    "titleBar.activeForeground": "#FFFFFF",
     "titleBar.inactiveBackground": "#241B7F",
-    "titleBar.inactiveForeground": "#FAF9FE",
+    "titleBar.inactiveForeground": "#FFFFFF",
     "statusBar.background": "#241B7F",
-    "statusBar.foreground": "#FAF9FE",
+    "statusBar.foreground": "#FFFFFF",
     "statusBar.debuggingBackground": "#241B7F",
-    "statusBar.debuggingForeground": "#FAF9FE",
+    "statusBar.debuggingForeground": "#FFFFFF",
     "statusBar.noFolderBackground": "#241B7F",
-    "statusBar.noFolderForeground": "#FAF9FE"
+    "statusBar.noFolderForeground": "#FFFFFF",
+    "activityBar.foreground": "#FFFFFF",
+    "activityBar.inactiveForeground": "#FFFFFF"
   },
-  "cSpell.words": [
-    "Jetpack",
-    "LEMONSQUEEZY",
-    "Millis",
-    "neondatabase",
-    "Squeezy",
-    "timestamptz",
-    "Waitlist"
-  ],
+  "cSpell.words": ["Jetpack", "LEMONSQUEEZY", "Millis", "Squeezy", "Waitlist"],
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "typescript.tsdk": "node_modules/typescript/lib",
   "editor.formatOnSave": true,

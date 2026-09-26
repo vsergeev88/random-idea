@@ -16,10 +16,10 @@ import { AUDIENCES, PAIN_ACTIONS, PROBLEMS, SERVICES } from "@/lib/idea-blocks";
 import {
   type AnalogyIdea,
   type GeneratedIdea,
-  type PainIdea,
   generateAnalogy,
   generateIdea,
   generatePain,
+  type PainIdea,
   type PinnedAnalogyBlocks,
   type PinnedBlocks,
   type PinnedPainBlocks,
@@ -1059,9 +1059,8 @@ export default function GeneratorPage() {
                       Нажми кнопку — получи боль
                     </p>
                     <p className="font-medium text-black/40 text-sm uppercase tracking-wide">
-                      {PAIN_ACTIONS.length} действий × {PROBLEMS.length}{" "}
-                      проблем ·{" "}
-                      {PAIN_ACTIONS.length * PROBLEMS.length} комбинаций
+                      {PAIN_ACTIONS.length} действий × {PROBLEMS.length} проблем
+                      · {PAIN_ACTIONS.length * PROBLEMS.length} комбинаций
                     </p>
                   </div>
                 )}
@@ -1114,9 +1113,7 @@ export default function GeneratorPage() {
                 type="button"
               >
                 <Shuffle className="size-4" />
-                {sessionCountPain === 0
-                  ? "Сгенерировать боль"
-                  : "Новая боль"}
+                {sessionCountPain === 0 ? "Сгенерировать боль" : "Новая боль"}
               </button>
               {currentPain && (
                 <button
